@@ -8,7 +8,8 @@ import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { JobContextData } from "@/pages/CreateInterview";
 import { useState } from "react";
-
+import { AIExplainability } from "./AIExplainability";
+import { CalibrationSlider } from "./CalibrationSlider";
 interface JobContextSetupProps {
   data: JobContextData;
   setData: (data: JobContextData) => void;
@@ -48,7 +49,7 @@ const experienceLevels = [
 
 export function JobContextSetup({ data, setData, onNext, onBack }: JobContextSetupProps) {
   const [newSkill, setNewSkill] = useState("");
-
+  const [calibration, setCalibration] = useState(50); // Balanced by default
   const addSkill = () => {
     if (newSkill.trim() && !data.skills.includes(newSkill.trim())) {
       setData({ ...data, skills: [...data.skills, newSkill.trim()] });
@@ -305,9 +306,32 @@ export function JobContextSetup({ data, setData, onNext, onBack }: JobContextSet
               </div>
             </div>
           </section>
+
+          {/* AI Calibration */}
+          <section>
+            <h3 className="text-base font-medium mb-4 flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-semibold">
+                5
+              </span>
+              AI Calibration
+            </h3>
+            <CalibrationSlider value={calibration} onChange={setCalibration} />
+          </section>
+
+          {/* AI Explainability Panel */}
+          {(data.title || data.skills.length > 0) && (
+            <section>
+              <h3 className="text-base font-medium mb-4 flex items-center gap-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-semibold">
+                  6
+                </span>
+                Why These Questions?
+              </h3>
+              <AIExplainability data={data} />
+            </section>
+          )}
         </div>
       </div>
-
       {/* Navigation */}
       <div className="mt-4 sm:mt-6 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
         <Button variant="outline" onClick={onBack} className="w-full sm:w-auto">

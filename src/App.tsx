@@ -12,6 +12,7 @@ import EvaluationReport from "./pages/EvaluationReport";
 import CandidateExperience from "./pages/CandidateExperience";
 import Integrations from "./pages/Integrations";
 import Settings from "./pages/Settings";
+import AIAnalytics from "./pages/AIAnalytics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/interview/:id" element={<CandidateExperience />} />
           <Route path="/integrations" element={<Integrations />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/analytics" element={<AIAnalytics />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

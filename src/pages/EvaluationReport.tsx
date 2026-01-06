@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { HumanOverride } from "@/components/report/HumanOverride";
+import { FairnessPanel } from "@/components/report/FairnessPanel";
+import { ShareableReport } from "@/components/report/ShareableReport";
 
 const mockReport = {
   candidate: {
@@ -129,10 +132,7 @@ const EvaluationReport = () => {
             </div>
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
-              <Share2 className="h-4 w-4 mr-2" />
-              Share
-            </Button>
+            <ShareableReport candidateId={id || "1"} candidateName={mockReport.candidate.name} />
             <Button size="sm" className="flex-1 sm:flex-none">
               <Download className="h-4 w-4 mr-2" />
               Download PDF
@@ -383,6 +383,21 @@ const EvaluationReport = () => {
                 ))}
               </CardContent>
             </Card>
+          </motion.div>
+
+          {/* Fairness Panel */}
+          <FairnessPanel integrity={mockReport.integrity} />
+
+          {/* Human Override */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <HumanOverride 
+              candidateId={id || "1"} 
+              aiRecommendation={mockReport.overall.recommendation} 
+            />
           </motion.div>
         </div>
       </main>

@@ -1,10 +1,12 @@
 import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Upload, FileSpreadsheet, Mail, Link2, AlertCircle, Check, X, ChevronDown } from "lucide-react";
+import { Upload, FileSpreadsheet, Mail, Link2, AlertCircle, Check, X, ChevronDown, Database, FileCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CandidateData } from "@/pages/CreateInterview";
+import { MappingTemplates } from "./MappingTemplates";
+import { Badge } from "@/components/ui/badge";
 
 interface CandidateImportProps {
   candidates: CandidateData[];
@@ -28,6 +30,31 @@ export function CandidateImport({ candidates, setCandidates, onNext }: Candidate
   });
   const [previewData, setPreviewData] = useState<string[][]>([]);
   const [availableColumns, setAvailableColumns] = useState<string[]>([]);
+
+  const handleApplyTemplate = (mapping: typeof columnMapping) => {
+    setColumnMapping(mapping);
+    // Re-apply mapping with new template
+    if (previewData.length > 0 && availableColumns.length > 0) {
+      const emailColIndex = availableColumns.indexOf(mapping.email);
+      const nameColIndex = mapping.name ? availableColumns.indexOf(mapping.name) : -1;
+      const phoneColIndex = mapping.phone ? availableColumns.indexOf(mapping.phone) : -1;
+      const titleColIndex = mapping.jobTitle ? availableColumns.indexOf(mapping.jobTitle) : -1;
+      const atsColIndex = mapping.atsId ? availableColumns.indexOf(mapping.atsId) : -1;
+
+      const mapped = previewData.map(row => {
+        const email = emailColIndex >= 0 ? row[emailColIndex] : "";
+        return {
+          email,
+          name: nameColIndex >= 0 ? row[nameColIndex] : undefined,
+          phone: phoneColIndex >= 0 ? row[phoneColIndex] : undefined,
+          jobTitle: titleColIndex >= 0 ? row[titleColIndex] : undefined,
+          atsId: atsColIndex >= 0 ? row[atsColIndex] : undefined,
+          isValid: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
+        };
+      });
+      setCandidates(mapped);
+    }
+  };
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -242,7 +269,13 @@ export function CandidateImport({ candidates, setCandidates, onNext }: Candidate
 
                 {/* Column mapping */}
                 <div>
-                  <h4 className="text-sm font-medium mb-3">Map your columns</h4>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-sm font-medium">Map your columns</h4>
+                    <MappingTemplates 
+                      currentMapping={columnMapping} 
+                      onApplyTemplate={handleApplyTemplate}
+                    />
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                     <MappingSelect
                       label="Candidate Name"
@@ -340,6 +373,21 @@ export function CandidateImport({ candidates, setCandidates, onNext }: Candidate
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* ATS Neutral Note */}
+            {uploadedFile && (
+              <div className="p-3 bg-accent/30 border border-primary/20 rounded-lg mt-4">
+                <div className="flex items-start gap-2">
+                  <Database className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-xs font-medium">ATS ID Preserved</p>
+                    <p className="text-xs text-muted-foreground">
+                      External Reference IDs are stored immutably. We never modify your ATS data.
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
 
