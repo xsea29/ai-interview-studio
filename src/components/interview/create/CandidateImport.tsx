@@ -148,14 +148,14 @@ export function CandidateImport({ candidates, setCandidates, onNext }: Candidate
 
   return (
     <div className="max-w-4xl">
-      {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-muted rounded-xl mb-6 inline-flex">
+      {/* Tabs - scrollable on mobile */}
+      <div className="flex gap-1 p-1 bg-muted rounded-xl mb-4 sm:mb-6 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 sm:inline-flex">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => !tab.comingSoon && setActiveTab(tab.id)}
             disabled={tab.comingSoon}
-            className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+            className={`relative flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
               activeTab === tab.id
                 ? "bg-card text-foreground shadow-sm"
                 : tab.comingSoon
@@ -163,15 +163,16 @@ export function CandidateImport({ candidates, setCandidates, onNext }: Candidate
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <tab.icon className="h-4 w-4" />
-            {tab.label}
+            <tab.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">{tab.label}</span>
+            <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
             {tab.comingSoon && (
-              <span className="text-[10px] uppercase tracking-wider bg-muted-foreground/20 px-1.5 py-0.5 rounded">
+              <span className="text-[8px] sm:text-[10px] uppercase tracking-wider bg-muted-foreground/20 px-1 sm:px-1.5 py-0.5 rounded">
                 Soon
               </span>
             )}
             {tab.highlighted && activeTab === tab.id && (
-              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full tab-indicator" />
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 sm:w-8 h-0.5 rounded-full tab-indicator" />
             )}
           </button>
         ))}
@@ -242,7 +243,7 @@ export function CandidateImport({ candidates, setCandidates, onNext }: Candidate
                 {/* Column mapping */}
                 <div>
                   <h4 className="text-sm font-medium mb-3">Map your columns</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                     <MappingSelect
                       label="Candidate Name"
                       value={columnMapping.name}
@@ -279,6 +280,7 @@ export function CandidateImport({ candidates, setCandidates, onNext }: Candidate
                     onClick={handleApplyMapping}
                     className="mt-4"
                     disabled={!columnMapping.email}
+                    size="sm"
                   >
                     Apply Mapping
                   </Button>
@@ -401,14 +403,14 @@ export function CandidateImport({ candidates, setCandidates, onNext }: Candidate
       </div>
 
       {/* Summary and continue */}
-      <div className="mt-6 flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
+      <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="text-xs sm:text-sm text-muted-foreground text-center sm:text-left">
           {candidates.length > 0 && (
             <span>
-              <strong className="text-foreground">{validCount}</strong> candidates ready to import
+              <strong className="text-foreground">{validCount}</strong> candidates ready
               {invalidCount > 0 && (
-                <span className="text-destructive ml-2">
-                  ({invalidCount} will be skipped)
+                <span className="text-destructive ml-1 sm:ml-2">
+                  ({invalidCount} skipped)
                 </span>
               )}
             </span>
@@ -417,7 +419,7 @@ export function CandidateImport({ candidates, setCandidates, onNext }: Candidate
         <Button
           onClick={onNext}
           disabled={validCount === 0}
-          className="ai-gradient"
+          className="ai-gradient w-full sm:w-auto"
         >
           Continue to Job Setup
         </Button>

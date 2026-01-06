@@ -8,7 +8,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container py-8 space-y-8">
+      <main className="container py-4 sm:py-8 px-4 sm:px-6 space-y-4 sm:space-y-8">
         <CreateInterviewCard />
         <StatsCards />
         <RecentInterviews />

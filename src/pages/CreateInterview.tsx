@@ -89,30 +89,30 @@ const CreateInterview = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container py-8">
+      <main className="container py-4 sm:py-8 px-4 sm:px-6">
         {/* Back button and title */}
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
           <Link to="/">
-            <Button variant="ghost" size="icon" className="text-muted-foreground">
-              <ArrowLeft className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="text-muted-foreground h-8 w-8 sm:h-9 sm:w-9">
+              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Create AI Interview</h1>
-            <p className="text-muted-foreground mt-0.5">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Create AI Interview</h1>
+            <p className="text-muted-foreground text-sm sm:text-base mt-0.5 hidden sm:block">
               Import candidates and configure your AI-powered interview
             </p>
           </div>
         </div>
 
-        {/* Progress steps */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between max-w-2xl">
+        {/* Progress steps - Mobile: horizontal scrollable, compact */}
+        <div className="mb-6 sm:mb-8 -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="flex items-center gap-2 sm:gap-0 sm:justify-between max-w-2xl overflow-x-auto pb-2 sm:pb-0">
             {steps.map((step, index) => (
-              <div key={step.id} className="flex items-center">
-                <div className="flex items-center gap-3">
+              <div key={step.id} className="flex items-center flex-shrink-0">
+                <div className="flex items-center gap-2 sm:gap-3">
                   <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all ${
+                    className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full border-2 transition-all ${
                       currentStep > step.id
                         ? "bg-primary border-primary"
                         : currentStep === step.id
@@ -121,9 +121,9 @@ const CreateInterview = () => {
                     }`}
                   >
                     {currentStep > step.id ? (
-                      <Check className="h-5 w-5 text-primary-foreground" />
+                      <Check className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
                     ) : (
-                      <span className="text-sm font-medium">{step.id}</span>
+                      <span className="text-xs sm:text-sm font-medium">{step.id}</span>
                     )}
                   </div>
                   <div className="hidden sm:block">
@@ -136,10 +136,20 @@ const CreateInterview = () => {
                     </div>
                     <div className="text-xs text-muted-foreground">{step.description}</div>
                   </div>
+                  {/* Mobile step name - shown below the circle */}
+                  <div className="sm:hidden">
+                    <div
+                      className={`text-xs font-medium whitespace-nowrap ${
+                        currentStep >= step.id ? "text-foreground" : "text-muted-foreground"
+                      }`}
+                    >
+                      {step.name.split(' ')[0]}
+                    </div>
+                  </div>
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`hidden sm:block w-16 lg:w-24 h-0.5 mx-4 ${
+                    className={`w-8 sm:w-16 lg:w-24 h-0.5 mx-2 sm:mx-4 ${
                       currentStep > step.id ? "bg-primary" : "bg-border"
                     }`}
                   />

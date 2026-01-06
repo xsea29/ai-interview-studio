@@ -71,54 +71,56 @@ export function JobContextSetup({ data, setData, onNext, onBack }: JobContextSet
 
   return (
     <div className="max-w-4xl">
-      <div className="rounded-xl bg-card border border-border card-elevated p-6">
+      <div className="rounded-lg sm:rounded-xl bg-card border border-border card-elevated p-4 sm:p-6">
         {/* Info banner */}
-        <div className="flex items-start gap-3 p-4 bg-accent/50 rounded-lg mb-6">
-          <Brain className="h-5 w-5 text-primary mt-0.5" />
+        <div className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 bg-accent/50 rounded-lg mb-4 sm:mb-6">
+          <Brain className="h-4 w-4 sm:h-5 sm:w-5 text-primary mt-0.5 shrink-0" />
           <div>
-            <h4 className="font-medium text-sm">AI Context Configuration</h4>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              This information helps the AI ask relevant questions and evaluate candidates accurately. 
-              This is <strong>not</strong> job pipeline management.
+            <h4 className="font-medium text-xs sm:text-sm">AI Context Configuration</h4>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+              This helps the AI ask relevant questions.
+              <span className="hidden sm:inline"> This is <strong>not</strong> job pipeline management.</span>
             </p>
           </div>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           {/* Job Basics */}
           <section>
-            <h3 className="text-base font-medium mb-4 flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-semibold">
+            <h3 className="text-sm sm:text-base font-medium mb-3 sm:mb-4 flex items-center gap-2">
+              <span className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-[10px] sm:text-xs font-semibold">
                 1
               </span>
               Job Basics
             </h3>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <label className="text-sm font-medium mb-2 block">Job Title *</label>
+                <label className="text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 block">Job Title *</label>
                 <Input
                   value={data.title}
                   onChange={(e) => setData({ ...data, title: e.target.value })}
                   placeholder="e.g., Senior Frontend Developer"
+                  className="text-sm"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium mb-2 block">Department</label>
+                <label className="text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 block">Department</label>
                 <Input
                   value={data.department}
                   onChange={(e) => setData({ ...data, department: e.target.value })}
                   placeholder="e.g., Engineering"
+                  className="text-sm"
                 />
               </div>
-              <div>
-                <label className="text-sm font-medium mb-2 block">Experience Level</label>
+              <div className="sm:col-span-1">
+                <label className="text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 block">Experience Level</label>
                 <Select
                   value={data.experienceLevel}
                   onValueChange={(v: "junior" | "mid" | "senior") =>
                     setData({ ...data, experienceLevel: v })
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -131,18 +133,18 @@ export function JobContextSetup({ data, setData, onNext, onBack }: JobContextSet
                 </Select>
               </div>
             </div>
-            <div className="mt-4">
-              <label className="text-sm font-medium mb-2 block">
+            <div className="mt-3 sm:mt-4">
+              <label className="text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 block">
                 Job Description
-                <span className="font-normal text-muted-foreground ml-1">
+                <span className="font-normal text-muted-foreground ml-1 hidden sm:inline">
                   (helps AI ask relevant questions)
                 </span>
               </label>
               <Textarea
                 value={data.description}
                 onChange={(e) => setData({ ...data, description: e.target.value })}
-                placeholder="Describe the role, responsibilities, and what you're looking for..."
-                className="min-h-[120px]"
+                placeholder="Describe the role, responsibilities..."
+                className="min-h-[100px] sm:min-h-[120px] text-sm"
               />
             </div>
           </section>
@@ -197,34 +199,34 @@ export function JobContextSetup({ data, setData, onNext, onBack }: JobContextSet
 
           {/* Interview Type */}
           <section>
-            <h3 className="text-base font-medium mb-4 flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-semibold">
+            <h3 className="text-sm sm:text-base font-medium mb-3 sm:mb-4 flex items-center gap-2">
+              <span className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-[10px] sm:text-xs font-semibold">
                 3
               </span>
               Interview Type
             </h3>
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
               {interviewTypes.map((type) => (
                 <button
                   key={type.id}
                   onClick={() => setData({ ...data, interviewType: type.id })}
-                  className={`relative p-5 rounded-xl border-2 text-left transition-all ${
+                  className={`relative p-4 sm:p-5 rounded-lg sm:rounded-xl border-2 text-left transition-all ${
                     data.interviewType === type.id
                       ? "border-primary bg-primary/5"
                       : "border-border hover:border-primary/50"
                   }`}
                 >
                   {data.interviewType === type.id && (
-                    <div className="absolute top-3 right-3 h-5 w-5 rounded-full bg-primary flex items-center justify-center">
-                      <span className="text-primary-foreground text-xs">✓</span>
+                    <div className="absolute top-2 sm:top-3 right-2 sm:right-3 h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-primary flex items-center justify-center">
+                      <span className="text-primary-foreground text-[10px] sm:text-xs">✓</span>
                     </div>
                   )}
-                  <type.icon className={`h-6 w-6 mb-3 ${
+                  <type.icon className={`h-5 w-5 sm:h-6 sm:w-6 mb-2 sm:mb-3 ${
                     data.interviewType === type.id ? "text-primary" : "text-muted-foreground"
                   }`} />
-                  <h4 className="font-medium mb-1">{type.title}</h4>
-                  <p className="text-sm text-muted-foreground mb-3">{type.description}</p>
-                  <p className="text-xs text-muted-foreground">
+                  <h4 className="font-medium text-sm sm:text-base mb-0.5 sm:mb-1">{type.title}</h4>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3">{type.description}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">
                     <span className="font-medium">AI Evaluates:</span> {type.evaluation}
                   </p>
                 </button>
@@ -307,11 +309,11 @@ export function JobContextSetup({ data, setData, onNext, onBack }: JobContextSet
       </div>
 
       {/* Navigation */}
-      <div className="mt-6 flex items-center justify-between">
-        <Button variant="outline" onClick={onBack}>
+      <div className="mt-4 sm:mt-6 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+        <Button variant="outline" onClick={onBack} className="w-full sm:w-auto">
           Back
         </Button>
-        <Button onClick={onNext} disabled={!isValid} className="ai-gradient">
+        <Button onClick={onNext} disabled={!isValid} className="ai-gradient w-full sm:w-auto">
           Preview Interview Setup
         </Button>
       </div>

@@ -60,37 +60,37 @@ export function ReviewLaunch({
 
   return (
     <div className="max-w-4xl">
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Main summary cards */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           {/* Candidates Summary */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-xl bg-card border border-border card-elevated p-6"
+            className="rounded-lg sm:rounded-xl bg-card border border-border card-elevated p-4 sm:p-6"
           >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                <Users className="h-5 w-5 text-primary" />
+            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+              <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-primary/10">
+                <Users className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               </div>
               <div>
-                <h3 className="font-medium">Candidates</h3>
-                <p className="text-sm text-muted-foreground">Ready to receive interviews</p>
+                <h3 className="font-medium text-sm sm:text-base">Candidates</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">Ready to receive interviews</p>
               </div>
             </div>
 
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-success/10 rounded-lg">
+            <div className="space-y-2 sm:space-y-3">
+              <div className="flex items-center justify-between p-2.5 sm:p-3 bg-success/10 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-success" />
-                  <span className="text-sm font-medium">{validCandidates.length} candidates imported</span>
+                  <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-success" />
+                  <span className="text-xs sm:text-sm font-medium">{validCandidates.length} candidates imported</span>
                 </div>
               </div>
               {invalidCandidates.length > 0 && (
-                <div className="flex items-center justify-between p-3 bg-destructive/10 rounded-lg">
+                <div className="flex items-center justify-between p-2.5 sm:p-3 bg-destructive/10 rounded-lg">
                   <div className="flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4 text-destructive" />
-                    <span className="text-sm">{invalidCandidates.length} invalid emails skipped</span>
+                    <AlertCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-destructive" />
+                    <span className="text-xs sm:text-sm">{invalidCandidates.length} invalid emails skipped</span>
                   </div>
                 </div>
               )}
@@ -98,20 +98,20 @@ export function ReviewLaunch({
 
             {/* Preview some candidates */}
             {validCandidates.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-border">
-                <div className="text-xs text-muted-foreground mb-2">Preview:</div>
-                <div className="flex flex-wrap gap-2">
-                  {validCandidates.slice(0, 5).map((c, i) => (
+              <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-border">
+                <div className="text-[10px] sm:text-xs text-muted-foreground mb-2">Preview:</div>
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                  {validCandidates.slice(0, 3).map((c, i) => (
                     <span
                       key={i}
-                      className="text-xs px-2 py-1 bg-muted rounded-md"
+                      className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-muted rounded-md truncate max-w-[100px] sm:max-w-none"
                     >
                       {c.name || c.email}
                     </span>
                   ))}
-                  {validCandidates.length > 5 && (
-                    <span className="text-xs px-2 py-1 text-muted-foreground">
-                      +{validCandidates.length - 5} more
+                  {validCandidates.length > 3 && (
+                    <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 text-muted-foreground">
+                      +{validCandidates.length - 3} more
                     </span>
                   )}
                 </div>
@@ -296,8 +296,13 @@ export function ReviewLaunch({
         </div>
       </div>
 
-      {/* Back button */}
-      <div className="mt-6">
+      {/* Back button - mobile only since delivery section has launch on desktop */}
+      <div className="mt-4 sm:mt-6 lg:hidden">
+        <Button variant="outline" onClick={onBack} className="w-full sm:w-auto">
+          Back
+        </Button>
+      </div>
+      <div className="hidden lg:block mt-6">
         <Button variant="outline" onClick={onBack}>
           Back
         </Button>
