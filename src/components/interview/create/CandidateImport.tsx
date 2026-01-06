@@ -427,7 +427,7 @@ function MappingSelect({
           <SelectValue placeholder="Select column" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">None</SelectItem>
+          <SelectItem value="none">None</SelectItem>
           {options.map((opt) => (
             <SelectItem key={opt} value={opt}>
               {opt}
