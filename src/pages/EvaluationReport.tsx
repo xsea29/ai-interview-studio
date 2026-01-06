@@ -9,6 +9,9 @@ import { Progress } from "@/components/ui/progress";
 import { HumanOverride } from "@/components/report/HumanOverride";
 import { FairnessPanel } from "@/components/report/FairnessPanel";
 import { ShareableReport } from "@/components/report/ShareableReport";
+import { AIVersionInfo } from "@/components/report/AIVersionInfo";
+import { AIConfidenceExplainer } from "@/components/report/AIConfidenceExplainer";
+import { AuditLog } from "@/components/report/AuditLog";
 
 const mockReport = {
   candidate: {
