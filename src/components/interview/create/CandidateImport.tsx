@@ -68,13 +68,35 @@ export function CandidateImport({ candidates, setCandidates, onNext }: Candidate
     ];
     setAvailableColumns(mockColumns);
     setPreviewData(mockData);
-    setColumnMapping({
+    
+    const newMapping = {
       name: "Full Name",
       email: "Email Address",
       phone: "Phone Number",
       jobTitle: "Position",
       atsId: "ATS ID",
+    };
+    setColumnMapping(newMapping);
+    
+    // Auto-apply mapping to create candidates
+    const emailColIndex = mockColumns.indexOf("Email Address");
+    const nameColIndex = mockColumns.indexOf("Full Name");
+    const phoneColIndex = mockColumns.indexOf("Phone Number");
+    const titleColIndex = mockColumns.indexOf("Position");
+    const atsColIndex = mockColumns.indexOf("ATS ID");
+
+    const mapped = mockData.map(row => {
+      const email = row[emailColIndex] || "";
+      return {
+        email,
+        name: nameColIndex >= 0 ? row[nameColIndex] : undefined,
+        phone: phoneColIndex >= 0 ? row[phoneColIndex] : undefined,
+        jobTitle: titleColIndex >= 0 ? row[titleColIndex] : undefined,
+        atsId: atsColIndex >= 0 ? row[atsColIndex] : undefined,
+        isValid: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
+      };
     });
+    setCandidates(mapped);
   };
 
   const parseEmailsFromText = (text: string): CandidateData[] => {
