@@ -12,15 +12,33 @@ import {
   Circle,
   Play,
   ExternalLink,
-  Download
+  Download,
+  Shield,
+  ShieldCheck,
+  ShieldAlert,
+  AlertTriangle,
+  ChevronDown,
+  Database
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 type InterviewStatus = "not_started" | "in_progress" | "completed";
 type InterviewType = "text" | "audio" | "video";
+type IntegrityLevel = "high" | "medium" | "low";
 
 interface CandidateInterview {
   id: string;
@@ -32,6 +50,14 @@ interface CandidateInterview {
   completedAt?: string;
   duration?: string;
   score?: number;
+  atsId?: string;
+  source: "csv" | "api" | "manual";
+  integrity?: {
+    level: IntegrityLevel;
+    tabSwitches?: number;
+    faceDetected?: boolean;
+    audioSilence?: boolean;
+  };
 }
 
 const mockInterviews: CandidateInterview[] = [
@@ -45,6 +71,9 @@ const mockInterviews: CandidateInterview[] = [
     completedAt: "2 hours ago",
     duration: "14m 32s",
     score: 87,
+    atsId: "GH-2024-001",
+    source: "csv",
+    integrity: { level: "high", tabSwitches: 0, faceDetected: true, audioSilence: false },
   },
   {
     id: "2",
@@ -54,6 +83,8 @@ const mockInterviews: CandidateInterview[] = [
     interviewType: "video",
     status: "in_progress",
     duration: "8m 15s",
+    atsId: "GH-2024-002",
+    source: "csv",
   },
   {
     id: "3",
@@ -65,6 +96,9 @@ const mockInterviews: CandidateInterview[] = [
     completedAt: "1 day ago",
     duration: "12m 45s",
     score: 92,
+    atsId: "GH-2024-003",
+    source: "csv",
+    integrity: { level: "high", tabSwitches: 1, faceDetected: true, audioSilence: false },
   },
   {
     id: "4",
@@ -73,6 +107,8 @@ const mockInterviews: CandidateInterview[] = [
     jobTitle: "Senior Frontend Developer",
     interviewType: "video",
     status: "not_started",
+    atsId: "LV-5678",
+    source: "manual",
   },
   {
     id: "5",
@@ -84,6 +120,8 @@ const mockInterviews: CandidateInterview[] = [
     completedAt: "3 hours ago",
     duration: "11m 20s",
     score: 78,
+    source: "csv",
+    integrity: { level: "medium", tabSwitches: 3, faceDetected: true, audioSilence: false },
   },
   {
     id: "6",
@@ -95,6 +133,9 @@ const mockInterviews: CandidateInterview[] = [
     completedAt: "1 day ago",
     duration: "15m 10s",
     score: 85,
+    atsId: "ASH-1234",
+    source: "csv",
+    integrity: { level: "high", tabSwitches: 0, faceDetected: true, audioSilence: false },
   },
   {
     id: "7",
@@ -103,6 +144,7 @@ const mockInterviews: CandidateInterview[] = [
     jobTitle: "Product Manager",
     interviewType: "audio",
     status: "not_started",
+    source: "manual",
   },
   {
     id: "8",
@@ -110,8 +152,13 @@ const mockInterviews: CandidateInterview[] = [
     email: "lisa.w@email.com",
     jobTitle: "UX Designer",
     interviewType: "text",
-    status: "in_progress",
-    duration: "5m 30s",
+    status: "completed",
+    completedAt: "5 hours ago",
+    duration: "18m 30s",
+    score: 65,
+    atsId: "WK-9999",
+    source: "csv",
+    integrity: { level: "low", tabSwitches: 8, faceDetected: false, audioSilence: true },
   },
 ];
 
@@ -139,16 +186,36 @@ const statusConfig = {
   },
 };
 
+const integrityConfig = {
+  high: {
+    icon: ShieldCheck,
+    label: "High",
+    className: "text-success bg-success/10",
+  },
+  medium: {
+    icon: Shield,
+    label: "Medium",
+    className: "text-warning bg-warning/10",
+  },
+  low: {
+    icon: ShieldAlert,
+    label: "Review",
+    className: "text-destructive bg-destructive/10",
+  },
+};
+
 const InterviewMonitoring = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [selectedCandidates, setSelectedCandidates] = useState<string[]>([]);
 
   const filteredInterviews = mockInterviews.filter((interview) => {
     const matchesSearch =
       interview.candidateName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       interview.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      interview.jobTitle.toLowerCase().includes(searchQuery.toLowerCase());
+      interview.jobTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      interview.atsId?.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesStatus = statusFilter === "all" || interview.status === statusFilter;
     const matchesType = typeFilter === "all" || interview.interviewType === typeFilter;
@@ -163,27 +230,98 @@ const InterviewMonitoring = () => {
     notStarted: mockInterviews.filter((i) => i.status === "not_started").length,
   };
 
+  const toggleSelectAll = () => {
+    if (selectedCandidates.length === filteredInterviews.length) {
+      setSelectedCandidates([]);
+    } else {
+      setSelectedCandidates(filteredInterviews.map(i => i.id));
+    }
+  };
+
+  const toggleCandidate = (id: string) => {
+    setSelectedCandidates(prev => 
+      prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkAction = (action: string) => {
+    toast.success(`${action} applied to ${selectedCandidates.length} candidates`);
+    setSelectedCandidates([]);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="container py-8">
+      <main className="container py-6 md:py-8 px-4">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Interview Monitoring</h1>
-            <p className="text-muted-foreground mt-0.5">
-              Track candidate interview progress and results
-            </p>
+        <div className="flex flex-col gap-4 mb-6 md:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-xl md:text-2xl font-semibold tracking-tight">AI Interview Monitoring</h1>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Track candidate progress and AI evaluation results
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-2 text-sm">
+                    <Download className="h-4 w-4" />
+                    <span className="hidden sm:inline">Export</span>
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>Export as CSV</DropdownMenuItem>
+                  <DropdownMenuItem>Export as JSON</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>Download All PDF Reports</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
-          <Button variant="outline" className="gap-2">
-            <Download className="h-4 w-4" />
-            Export Results
-          </Button>
+
+          {/* Bulk Actions */}
+          {selectedCandidates.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/20"
+            >
+              <span className="text-sm font-medium">
+                {selectedCandidates.length} selected
+              </span>
+              <div className="flex gap-2 ml-auto">
+                <Button size="sm" variant="outline" onClick={() => handleBulkAction("Shortlist")}>
+                  Shortlist
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => handleBulkAction("Reject")}>
+                  Reject
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="sm" variant="outline">
+                      Export Selected
+                      <ChevronDown className="h-3.5 w-3.5 ml-1" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => handleBulkAction("CSV Export")}>CSV</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleBulkAction("JSON Export")}>JSON</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleBulkAction("PDF Export")}>PDF Reports</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Button size="sm" variant="ghost" onClick={() => setSelectedCandidates([])}>
+                  Clear
+                </Button>
+              </div>
+            </motion.div>
+          )}
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
           <StatCard label="Total Candidates" value={stats.total} />
           <StatCard label="Completed" value={stats.completed} variant="success" />
           <StatCard label="In Progress" value={stats.inProgress} variant="warning" />
@@ -197,12 +335,12 @@ const InterviewMonitoring = () => {
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search candidates..."
-              className="pl-9"
+              placeholder="Search by name, email, or ATS ID..."
+              className="pl-9 text-sm"
             />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="w-full sm:w-[160px]">
               <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
               <SelectValue placeholder="Status" />
             </SelectTrigger>
@@ -214,7 +352,7 @@ const InterviewMonitoring = () => {
             </SelectContent>
           </Select>
           <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="w-full sm:w-[160px]">
               <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>
@@ -236,25 +374,28 @@ const InterviewMonitoring = () => {
             <table className="w-full">
               <thead className="bg-muted/50 border-b border-border">
                 <tr>
-                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
+                  <th className="text-left px-4 md:px-6 py-4 w-10">
+                    <Checkbox 
+                      checked={selectedCandidates.length === filteredInterviews.length && filteredInterviews.length > 0}
+                      onCheckedChange={toggleSelectAll}
+                    />
+                  </th>
+                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 md:px-6 py-4">
                     Candidate
                   </th>
-                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
+                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 md:px-6 py-4 hidden lg:table-cell">
                     Position
                   </th>
-                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
-                    Type
-                  </th>
-                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
+                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 md:px-6 py-4 hidden md:table-cell">
                     Status
                   </th>
-                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
-                    Duration
+                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 md:px-6 py-4 hidden xl:table-cell">
+                    Integrity
                   </th>
-                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
+                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 md:px-6 py-4">
                     Score
                   </th>
-                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
+                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 md:px-6 py-4 hidden sm:table-cell">
                     <span className="sr-only">Actions</span>
                   </th>
                 </tr>
@@ -264,65 +405,82 @@ const InterviewMonitoring = () => {
                   const TypeIcon = typeIcons[interview.interviewType];
                   const statusInfo = statusConfig[interview.status];
                   const StatusIcon = statusInfo.icon;
+                  const integrityInfo = interview.integrity ? integrityConfig[interview.integrity.level] : null;
+                  const IntegrityIcon = integrityInfo?.icon;
 
                   return (
                     <tr
                       key={interview.id}
-                      className="hover:bg-muted/30 transition-colors"
+                      className={`hover:bg-muted/30 transition-colors ${selectedCandidates.includes(interview.id) ? 'bg-primary/5' : ''}`}
                     >
-                      <td className="px-6 py-4">
+                      <td className="px-4 md:px-6 py-4">
+                        <Checkbox 
+                          checked={selectedCandidates.includes(interview.id)}
+                          onCheckedChange={() => toggleCandidate(interview.id)}
+                        />
+                      </td>
+                      <td className="px-4 md:px-6 py-4">
                         <div>
-                          <div className="font-medium">{interview.candidateName}</div>
-                          <div className="text-sm text-muted-foreground">
+                          <div className="font-medium text-sm md:text-base">{interview.candidateName}</div>
+                          <div className="text-xs md:text-sm text-muted-foreground">
                             {interview.email}
                           </div>
+                          {interview.atsId && (
+                            <div className="flex items-center gap-1 mt-1">
+                              <Database className="h-3 w-3 text-muted-foreground" />
+                              <span className="text-[10px] md:text-xs text-muted-foreground font-mono">
+                                {interview.atsId}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className="text-sm">{interview.jobTitle}</span>
-                      </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 md:px-6 py-4 hidden lg:table-cell">
                         <div className="flex items-center gap-2">
                           <TypeIcon className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm capitalize">
-                            {interview.interviewType}
-                          </span>
+                          <span className="text-sm">{interview.jobTitle}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 md:px-6 py-4 hidden md:table-cell">
                         <span className={statusInfo.className}>
                           <StatusIcon className="h-3.5 w-3.5" />
                           {statusInfo.label}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                          <Clock className="h-3.5 w-3.5" />
-                          {interview.duration || "—"}
-                        </div>
+                      <td className="px-4 md:px-6 py-4 hidden xl:table-cell">
+                        {integrityInfo && IntegrityIcon ? (
+                          <Badge variant="secondary" className={`gap-1 text-xs ${integrityInfo.className}`}>
+                            <IntegrityIcon className="h-3 w-3" />
+                            {integrityInfo.label}
+                          </Badge>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">—</span>
+                        )}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 md:px-6 py-4">
                         {interview.score !== undefined ? (
                           <div className="flex items-center gap-2">
-                            <div className="w-12 h-1.5 rounded-full bg-muted overflow-hidden">
+                            <div className="w-10 md:w-12 h-1.5 rounded-full bg-muted overflow-hidden">
                               <div
                                 className="h-full rounded-full ai-gradient"
                                 style={{ width: `${interview.score}%` }}
                               />
                             </div>
-                            <span className="text-sm font-medium">{interview.score}%</span>
+                            <span className="text-xs md:text-sm font-medium">{interview.score}%</span>
                           </div>
                         ) : (
                           <span className="text-sm text-muted-foreground">—</span>
                         )}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 md:px-6 py-4 hidden sm:table-cell">
                         <div className="flex items-center gap-1">
                           {interview.status === "completed" && (
-                            <Button variant="ghost" size="sm" className="gap-1.5">
-                              <ExternalLink className="h-3.5 w-3.5" />
-                              View
-                            </Button>
+                            <Link to={`/report/${interview.id}`}>
+                              <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
+                                <ExternalLink className="h-3.5 w-3.5" />
+                                View Report
+                              </Button>
+                            </Link>
                           )}
                           <Button variant="ghost" size="icon" className="text-muted-foreground">
                             <MoreHorizontal className="h-4 w-4" />
@@ -341,6 +499,36 @@ const InterviewMonitoring = () => {
               <p className="text-muted-foreground">No interviews found</p>
             </div>
           )}
+        </motion.div>
+
+        {/* Integrity Legend */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="mt-6 p-4 rounded-lg bg-muted/50 border border-dashed"
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <Shield className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium">Interview Integrity</span>
+          </div>
+          <p className="text-xs text-muted-foreground mb-3">
+            AI monitors interview integrity without invasive surveillance. Flags are for your review, not automatic disqualification.
+          </p>
+          <div className="flex flex-wrap gap-4 text-xs">
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck className="h-3.5 w-3.5 text-success" />
+              <span>High: No concerns detected</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Shield className="h-3.5 w-3.5 text-warning" />
+              <span>Medium: Minor flags (e.g., tab switches)</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <ShieldAlert className="h-3.5 w-3.5 text-destructive" />
+              <span>Review: Multiple flags require attention</span>
+            </div>
+          </div>
         </motion.div>
       </main>
     </div>
@@ -364,9 +552,9 @@ function StatCard({
   };
 
   return (
-    <div className="rounded-lg bg-card border border-border p-4">
-      <div className={`text-2xl font-semibold ${valueColors[variant]}`}>{value}</div>
-      <div className="text-sm text-muted-foreground mt-0.5">{label}</div>
+    <div className="rounded-lg bg-card border border-border p-3 md:p-4">
+      <div className={`text-xl md:text-2xl font-semibold ${valueColors[variant]}`}>{value}</div>
+      <div className="text-xs md:text-sm text-muted-foreground mt-0.5">{label}</div>
     </div>
   );
 }
