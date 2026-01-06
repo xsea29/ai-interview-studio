@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import CreateInterview from "./pages/CreateInterview";
 import InterviewMonitoring from "./pages/InterviewMonitoring";
 import InterviewDetail from "./pages/InterviewDetail";
+import InterviewReadiness from "./pages/InterviewReadiness";
 import EvaluationReport from "./pages/EvaluationReport";
 import CandidateExperience from "./pages/CandidateExperience";
 import Integrations from "./pages/Integrations";
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/create" element={<CreateInterview />} />
           <Route path="/interviews" element={<InterviewMonitoring />} />
           <Route path="/interviews/:id" element={<InterviewDetail />} />
+          <Route path="/readiness/:id" element={<InterviewReadiness />} />
           <Route path="/report/:id" element={<EvaluationReport />} />
           <Route path="/interview/:id" element={<CandidateExperience />} />
           <Route path="/integrations" element={<Integrations />} />
