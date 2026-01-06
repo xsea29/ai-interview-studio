@@ -34,21 +34,21 @@ const stats = [
 
 export function StatsCards() {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       {stats.map((stat, index) => (
         <motion.div
           key={stat.label}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: index * 0.1 }}
-          className="rounded-xl bg-card border border-border p-5 card-elevated"
+          className="rounded-lg sm:rounded-xl bg-card border border-border p-3 sm:p-5 card-elevated"
         >
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-              <stat.icon className="h-4.5 w-4.5 text-primary" />
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <div className="flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-primary/10">
+              <stat.icon className="h-3.5 w-3.5 sm:h-4.5 sm:w-4.5 text-primary" />
             </div>
             <span
-              className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+              className={`text-[10px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 rounded-full ${
                 stat.changeType === "positive"
                   ? "bg-success/10 text-success"
                   : "bg-muted text-muted-foreground"
@@ -57,8 +57,8 @@ export function StatsCards() {
               {stat.change}
             </span>
           </div>
-          <div className="text-2xl font-semibold tracking-tight">{stat.value}</div>
-          <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
+          <div className="text-lg sm:text-2xl font-semibold tracking-tight">{stat.value}</div>
+          <div className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">{stat.label}</div>
         </motion.div>
       ))}
     </div>
