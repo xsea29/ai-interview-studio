@@ -16,11 +16,14 @@ import {
   Circle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CandidateConsentScreen } from "@/components/interview/CandidateConsentScreen";
+import { FailureRecoveryBanner } from "@/components/interview/FailureRecoveryBanner";
 
-type CandidateStep = "welcome" | "checklist" | "interview" | "complete";
+type CandidateStep = "welcome" | "consent" | "checklist" | "interview" | "complete";
 
 const CandidateExperience = () => {
   const [currentStep, setCurrentStep] = useState<CandidateStep>("welcome");
+  const [showRecoveryBanner, setShowRecoveryBanner] = useState(false);
   const [checklistItems, setChecklistItems] = useState({
     quiet: false,
     mic: false,
@@ -48,7 +51,15 @@ const CandidateExperience = () => {
   ];
 
   const handleStartChecklist = () => {
+    setCurrentStep("consent");
+  };
+
+  const handleConsent = () => {
     setCurrentStep("checklist");
+  };
+
+  const handleDecline = () => {
+    window.location.href = "/";
   };
 
   const handleStartInterview = () => {
@@ -66,6 +77,15 @@ const CandidateExperience = () => {
     } else {
       setCurrentStep("complete");
     }
+  };
+
+  // Simulate network issue for demo
+  const simulateNetworkIssue = () => {
+    setShowRecoveryBanner(true);
+  };
+
+  const handleRetry = () => {
+    setShowRecoveryBanner(false);
   };
 
   const handleEndInterview = () => {
@@ -94,6 +114,13 @@ const CandidateExperience = () => {
       </header>
 
       <main className="container py-6 md:py-8 px-4">
+        {/* Failure Recovery Banner */}
+        {showRecoveryBanner && (
+          <FailureRecoveryBanner
+            onRetry={handleRetry}
+          />
+        )}
+
         <AnimatePresence mode="wait">
           {currentStep === "welcome" && (
             <motion.div
@@ -136,6 +163,18 @@ const CandidateExperience = () => {
                 Get Started
               </Button>
             </motion.div>
+          )}
+
+          {currentStep === "consent" && (
+            <CandidateConsentScreen
+              companyName="Acme Inc"
+              jobTitle="Senior Frontend Developer"
+              duration={25}
+              questionCount={8}
+              retentionPeriod="90 days"
+              onConsent={handleConsent}
+              onDecline={handleDecline}
+            />
           )}
 
           {currentStep === "checklist" && (

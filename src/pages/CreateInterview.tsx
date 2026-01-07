@@ -6,6 +6,8 @@ import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { CandidateImport } from "@/components/interview/create/CandidateImport";
 import { JobContextSetup } from "@/components/interview/create/JobContextSetup";
+import { AccessPolicyConfig, AccessPolicy } from "@/components/interview/create/AccessPolicyConfig";
+import { NotificationConfig, NotificationSettings } from "@/components/interview/create/NotificationConfig";
 import { ReviewLaunch } from "@/components/interview/create/ReviewLaunch";
 import { SuccessScreen } from "@/components/interview/create/SuccessScreen";
 
@@ -38,7 +40,8 @@ export interface DeliveryMethod {
 const steps = [
   { id: 1, name: "Import Candidates", description: "Upload or enter candidates" },
   { id: 2, name: "Job Context", description: "Configure AI interview" },
-  { id: 3, name: "Review & Launch", description: "Confirm and send" },
+  { id: 3, name: "Access & Notify", description: "Rules and notifications" },
+  { id: 4, name: "Review & Launch", description: "Confirm and send" },
 ];
 
 const CreateInterview = () => {
@@ -58,10 +61,26 @@ const CreateInterview = () => {
     adaptiveDifficulty: true,
     allowResumeReference: false,
   });
+  const [accessPolicy, setAccessPolicy] = useState<AccessPolicy>({
+    validFrom: new Date().toISOString().slice(0, 16),
+    validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16),
+    maxAttempts: 1,
+    canResume: true,
+    deviceLock: false,
+    autoExpireMinutes: 15,
+  });
+  const [notifications, setNotifications] = useState<NotificationSettings>({
+    sendInvite: true,
+    reminder24h: true,
+    reminder2h: false,
+    expiryWarning: true,
+    onSubmitted: true,
+    onFailure: true,
+  });
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>({ type: "email" });
 
   const handleNext = () => {
-    if (currentStep < 3) {
+    if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -184,9 +203,22 @@ const CreateInterview = () => {
               />
             )}
             {currentStep === 3 && (
+              <AccessNotifyStep
+                accessPolicy={accessPolicy}
+                setAccessPolicy={setAccessPolicy}
+                notifications={notifications}
+                setNotifications={setNotifications}
+                jobTitle={jobContext.title}
+                onNext={handleNext}
+                onBack={handleBack}
+              />
+            )}
+            {currentStep === 4 && (
               <ReviewLaunch
                 candidates={candidates}
                 jobContext={jobContext}
+                accessPolicy={accessPolicy}
+                notifications={notifications}
                 deliveryMethod={deliveryMethod}
                 setDeliveryMethod={setDeliveryMethod}
                 onLaunch={handleLaunch}
@@ -199,5 +231,53 @@ const CreateInterview = () => {
     </div>
   );
 };
+
+// Step 3: Access & Notify
+interface AccessNotifyStepProps {
+  accessPolicy: AccessPolicy;
+  setAccessPolicy: (policy: AccessPolicy) => void;
+  notifications: NotificationSettings;
+  setNotifications: (settings: NotificationSettings) => void;
+  jobTitle: string;
+  onNext: () => void;
+  onBack: () => void;
+}
+
+function AccessNotifyStep({
+  accessPolicy,
+  setAccessPolicy,
+  notifications,
+  setNotifications,
+  jobTitle,
+  onNext,
+  onBack,
+}: AccessNotifyStepProps) {
+  return (
+    <div className="max-w-3xl mx-auto space-y-6">
+      <div>
+        <h2 className="text-lg font-semibold mb-1">Access & Notifications</h2>
+        <p className="text-sm text-muted-foreground">
+          Configure interview access rules and candidate notifications
+        </p>
+      </div>
+
+      <AccessPolicyConfig policy={accessPolicy} onChange={setAccessPolicy} />
+      <NotificationConfig
+        settings={notifications}
+        onChange={setNotifications}
+        jobTitle={jobTitle || "the role"}
+      />
+
+      <div className="flex items-center justify-between pt-4">
+        <Button variant="outline" onClick={onBack}>
+          Back
+        </Button>
+        <Button onClick={onNext} className="ai-gradient">
+          Continue to Review
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export default CreateInterview;
