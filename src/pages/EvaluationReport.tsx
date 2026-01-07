@@ -391,6 +391,33 @@ const EvaluationReport = () => {
           {/* Fairness Panel */}
           <FairnessPanel integrity={mockReport.integrity} />
 
+          {/* AI Confidence Explainer */}
+          <AIConfidenceExplainer
+            confidence={{
+              overall: "high",
+              score: 87,
+              factors: {
+                responseLength: "adequate",
+                audioQuality: "good",
+                responseTime: "normal",
+                topicCoverage: "complete",
+              },
+              limitations: [
+                "Some responses could have included more specific metrics",
+              ],
+            }}
+          />
+
+          {/* AI Version Info */}
+          <AIVersionInfo
+            version={{
+              modelVersion: "v1.3",
+              promptVersion: "v2.1",
+              scoringRubricVersion: "v1.0",
+              evaluatedAt: "January 15, 2024 at 2:32 PM",
+            }}
+          />
+
           {/* Human Override */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -402,6 +429,45 @@ const EvaluationReport = () => {
               aiRecommendation={mockReport.overall.recommendation} 
             />
           </motion.div>
+
+          {/* Audit Log */}
+          <AuditLog
+            interviewId={id || "1"}
+            entries={[
+              {
+                id: "1",
+                action: "created",
+                actor: "Jane Smith",
+                actorEmail: "jane@company.com",
+                timestamp: "Jan 14, 2024 10:30 AM",
+                details: "Created AI interview for Senior Frontend Developer role"
+              },
+              {
+                id: "2",
+                action: "sent",
+                actor: "System",
+                actorEmail: "system@interviewai.com",
+                timestamp: "Jan 14, 2024 10:31 AM",
+                details: "Email invitation sent to sarah@example.com"
+              },
+              {
+                id: "3",
+                action: "viewed",
+                actor: "Sarah Chen",
+                actorEmail: "sarah@example.com",
+                timestamp: "Jan 15, 2024 2:05 PM",
+                details: "Candidate opened interview link"
+              },
+              {
+                id: "4",
+                action: "decided",
+                actor: "System",
+                actorEmail: "system@interviewai.com",
+                timestamp: "Jan 15, 2024 2:32 PM",
+                details: "AI evaluation completed with Strong Hire recommendation"
+              },
+            ]}
+          />
         </div>
       </main>
     </div>

@@ -1,11 +1,15 @@
 import { motion } from "framer-motion";
-import { Users, Briefcase, Settings, Send, Mail, Copy, FileDown, AlertCircle, Check, MessageSquare, Mic, Video, Brain, Clock, Sparkles } from "lucide-react";
+import { Users, Briefcase, Settings, Send, Mail, Copy, FileDown, AlertCircle, Check, MessageSquare, Mic, Video, Brain, Clock, Sparkles, Shield, Bell, Calendar, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CandidateData, JobContextData, DeliveryMethod } from "@/pages/CreateInterview";
+import { AccessPolicy } from "./AccessPolicyConfig";
+import { NotificationSettings } from "./NotificationConfig";
 
 interface ReviewLaunchProps {
   candidates: CandidateData[];
   jobContext: JobContextData;
+  accessPolicy: AccessPolicy;
+  notifications: NotificationSettings;
   deliveryMethod: DeliveryMethod;
   setDeliveryMethod: (method: DeliveryMethod) => void;
   onLaunch: () => void;
@@ -49,6 +53,8 @@ const deliveryOptions = [
 export function ReviewLaunch({
   candidates,
   jobContext,
+  accessPolicy,
+  notifications,
   deliveryMethod,
   setDeliveryMethod,
   onLaunch,
@@ -233,6 +239,92 @@ export function ReviewLaunch({
                   Resume reference allowed
                 </span>
               </div>
+            </div>
+          </motion.div>
+
+          {/* Access Policy Summary */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="rounded-xl bg-card border border-border card-elevated p-6"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                <Shield className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-medium">Access Policy</h3>
+                <p className="text-sm text-muted-foreground">Interview access rules</p>
+              </div>
+            </div>
+
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Calendar className="h-4 w-4" />
+                <span>Valid until: {new Date(accessPolicy.validUntil).toLocaleDateString()}</span>
+              </div>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <RefreshCw className="h-4 w-4" />
+                <span>{accessPolicy.maxAttempts} attempt{accessPolicy.maxAttempts > 1 ? 's' : ''} allowed</span>
+              </div>
+              {accessPolicy.canResume && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Check className="h-4 w-4 text-success" />
+                  <span>Resume on disconnect</span>
+                </div>
+              )}
+              {accessPolicy.deviceLock && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Check className="h-4 w-4 text-success" />
+                  <span>Device lock enabled</span>
+                </div>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Notifications Summary */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="rounded-xl bg-card border border-border card-elevated p-6"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                <Bell className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-medium">Notifications</h3>
+                <p className="text-sm text-muted-foreground">Email triggers configured</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              {notifications.sendInvite && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Check className="h-4 w-4 text-success" />
+                  <span>Interview invite</span>
+                </div>
+              )}
+              {notifications.reminder24h && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Check className="h-4 w-4 text-success" />
+                  <span>24-hour reminder</span>
+                </div>
+              )}
+              {notifications.expiryWarning && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Check className="h-4 w-4 text-success" />
+                  <span>Expiry warning</span>
+                </div>
+              )}
+              {notifications.onSubmitted && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Check className="h-4 w-4 text-success" />
+                  <span>Submission confirmation</span>
+                </div>
+              )}
             </div>
           </motion.div>
         </div>

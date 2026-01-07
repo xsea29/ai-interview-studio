@@ -9,7 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { DataOwnershipSettings } from "@/components/settings/DataOwnershipSettings";
+import { RoleSettings } from "@/components/settings/RoleSettings";
 
 const Settings = () => {
   const [companyName, setCompanyName] = useState("Acme Corp");
@@ -32,7 +35,7 @@ const Settings = () => {
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
             <p className="text-muted-foreground mt-0.5">
-              Configure your AI Interview defaults
+              Configure your AI Interview platform
             </p>
           </div>
           <Button onClick={handleSave}>
@@ -41,7 +44,14 @@ const Settings = () => {
           </Button>
         </div>
 
-        <div className="space-y-6">
+        <Tabs defaultValue="general" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="general">General</TabsTrigger>
+            <TabsTrigger value="data">Data & Privacy</TabsTrigger>
+            <TabsTrigger value="team">Team & Roles</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="general" className="space-y-6">
           {/* Company Branding */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -266,7 +276,16 @@ const Settings = () => {
               </CardContent>
             </Card>
           </motion.div>
-        </div>
+          </TabsContent>
+
+          <TabsContent value="data" className="space-y-6">
+            <DataOwnershipSettings />
+          </TabsContent>
+
+          <TabsContent value="team" className="space-y-6">
+            <RoleSettings />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
