@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
-import { Brain, Clock, TrendingUp, Users, CheckCircle, Gauge, BarChart3, Activity } from "lucide-react";
+import { Brain, Clock, TrendingUp, Users, CheckCircle, Gauge, BarChart3, Activity, Filter, AlertTriangle, SkipForward } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 
 const mockAnalytics = {
   totalInterviews: 156,
@@ -30,6 +31,19 @@ const mockAnalytics = {
     { week: "Week 3", count: 10 },
     { week: "Week 4", count: 12 },
   ],
+  // Candidate dropoff funnel
+  dropoffFunnel: [
+    { stage: "Welcome", candidates: 156, dropoff: 0 },
+    { stage: "Consent", candidates: 148, dropoff: 8 },
+    { stage: "Checklist", candidates: 142, dropoff: 6 },
+    { stage: "Q1-Q3", candidates: 138, dropoff: 4 },
+    { stage: "Q4-Q6", candidates: 130, dropoff: 8 },
+    { stage: "Q7-Q8", candidates: 124, dropoff: 6 },
+    { stage: "Complete", candidates: 118, dropoff: 6 },
+  ],
+  avgResponseTime: 2.4, // minutes per question
+  silentResponses: 12,
+  skippedQuestions: 8,
 };
 
 const AIAnalytics = () => {
@@ -301,11 +315,87 @@ const AIAnalytics = () => {
           </motion.div>
         </div>
 
-        {/* Disclaimer */}
+        {/* Candidate Dropoff Funnel */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
+          className="mt-6"
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Filter className="h-5 w-5 text-primary" />
+                Candidate Dropoff Funnel
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {mockAnalytics.dropoffFunnel.map((stage, index) => {
+                  const percentage = Math.round((stage.candidates / mockAnalytics.dropoffFunnel[0].candidates) * 100);
+                  const isLastStage = index === mockAnalytics.dropoffFunnel.length - 1;
+                  return (
+                    <div key={stage.stage} className="relative">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">{stage.stage}</span>
+                          {stage.dropoff > 0 && (
+                            <Badge variant="outline" className="text-xs text-destructive border-destructive/30">
+                              -{stage.dropoff}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm text-muted-foreground">{stage.candidates} candidates</span>
+                          <span className={`text-sm font-medium ${isLastStage ? 'text-success' : ''}`}>{percentage}%</span>
+                        </div>
+                      </div>
+                      <div className="h-6 w-full rounded bg-muted overflow-hidden">
+                        <motion.div
+                          className={`h-full rounded ${isLastStage ? 'bg-success' : 'ai-gradient'}`}
+                          initial={{ width: 0 }}
+                          animate={{ width: `${percentage}%` }}
+                          transition={{ duration: 0.5, delay: index * 0.1 }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {/* Dropoff Stats */}
+              <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t">
+                <div className="text-center p-3 rounded-lg bg-muted/50">
+                  <div className="flex items-center justify-center gap-1.5 mb-1">
+                    <Clock className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="text-lg font-semibold">{mockAnalytics.avgResponseTime}m</div>
+                  <div className="text-xs text-muted-foreground">Avg Response Time</div>
+                </div>
+                <div className="text-center p-3 rounded-lg bg-muted/50">
+                  <div className="flex items-center justify-center gap-1.5 mb-1">
+                    <AlertTriangle className="h-4 w-4 text-warning" />
+                  </div>
+                  <div className="text-lg font-semibold">{mockAnalytics.silentResponses}</div>
+                  <div className="text-xs text-muted-foreground">Silent Responses</div>
+                </div>
+                <div className="text-center p-3 rounded-lg bg-muted/50">
+                  <div className="flex items-center justify-center gap-1.5 mb-1">
+                    <SkipForward className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div className="text-lg font-semibold">{mockAnalytics.skippedQuestions}</div>
+                  <div className="text-xs text-muted-foreground">Skipped Questions</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Disclaimer */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
           className="mt-6"
         >
           <div className="p-4 bg-muted/30 rounded-lg border border-border">

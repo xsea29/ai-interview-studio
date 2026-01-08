@@ -342,9 +342,9 @@ export default function OrganizationDetail() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary" className={roleColors[user.role]}>
+                    <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${roleColors[user.role]}`}>
                       {user.role}
-                    </Badge>
+                    </span>
                   </TableCell>
                   <TableCell>
                     {user.status === "active" ? (

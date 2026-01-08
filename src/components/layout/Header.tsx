@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Brain, Bell, Settings, User, Link2, Menu, X } from "lucide-react";
+import { Brain, Bell, Settings, User, Link2, Menu, Shield, Building2 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -17,6 +17,7 @@ export function Header() {
   const navLinks = [
     { path: "/", label: "Dashboard" },
     { path: "/interviews", label: "Interviews" },
+    { path: "/analytics", label: "Analytics" },
     { path: "/integrations", label: "Integrations", icon: Link2 },
   ];
 
@@ -103,6 +104,16 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-1 sm:gap-2">
+          <Link to="/onboarding" className="hidden md:block">
+            <Button variant="ghost" size="icon" className="text-muted-foreground" title="Company Onboarding">
+              <Building2 className="h-4 w-4" />
+            </Button>
+          </Link>
+          <Link to="/admin" className="hidden md:block">
+            <Button variant="ghost" size="icon" className="text-muted-foreground" title="Platform Admin">
+              <Shield className="h-4 w-4" />
+            </Button>
+          </Link>
           <Button variant="ghost" size="icon" className="text-muted-foreground h-8 w-8 sm:h-9 sm:w-9">
             <Bell className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
           </Button>
