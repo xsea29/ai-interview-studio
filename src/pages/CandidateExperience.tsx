@@ -21,6 +21,16 @@ import { FailureRecoveryBanner } from "@/components/interview/FailureRecoveryBan
 
 type CandidateStep = "welcome" | "consent" | "checklist" | "interview" | "complete";
 
+// Company branding - in production this would come from the interview invite/org settings
+const companyBranding = {
+  name: "Acme Inc",
+  logoUrl: null, // Would be company logo URL
+  primaryColor: "#0ea5e9",
+  recruiterName: "Sarah Chen",
+  recruiterEmail: "sarah@acme.com",
+  jobTitle: "Senior Frontend Developer",
+};
+
 const CandidateExperience = () => {
   const [currentStep, setCurrentStep] = useState<CandidateStep>("welcome");
   const [showRecoveryBanner, setShowRecoveryBanner] = useState(false);
@@ -98,18 +108,31 @@ const CandidateExperience = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Simple header */}
+      {/* White-labeled header */}
       <header className="border-b border-border bg-card">
         <div className="container flex h-14 items-center justify-between px-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg ai-gradient">
-              <Brain className="h-4 w-4 text-primary-foreground" />
-            </div>
-            <span className="text-sm font-semibold hidden sm:inline">InterviewAI</span>
+            {companyBranding.logoUrl ? (
+              <img 
+                src={companyBranding.logoUrl} 
+                alt={companyBranding.name} 
+                className="h-8 w-8 rounded-lg object-contain"
+              />
+            ) : (
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary font-semibold text-sm">
+                {companyBranding.name.charAt(0)}
+              </div>
+            )}
+            <span className="text-sm font-semibold hidden sm:inline">{companyBranding.name}</span>
           </div>
-          <span className="text-xs text-muted-foreground text-right">
-            Senior Frontend Developer Interview
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-muted-foreground text-right">
+              {companyBranding.jobTitle}
+            </span>
+            <span className="text-[10px] text-muted-foreground/60 hidden sm:inline border-l pl-3">
+              Powered by AI
+            </span>
+          </div>
         </div>
       </header>
 
@@ -138,7 +161,7 @@ const CandidateExperience = () => {
               </h1>
               <p className="text-muted-foreground mb-8 text-sm md:text-base">
                 You've been invited to complete an AI-powered interview for the 
-                <strong className="text-foreground"> Senior Frontend Developer</strong> position at Acme Inc.
+                <strong className="text-foreground"> {companyBranding.jobTitle}</strong> position at {companyBranding.name}.
               </p>
               
               <div className="bg-card border border-border rounded-xl p-5 md:p-6 mb-6 text-left">
@@ -167,8 +190,8 @@ const CandidateExperience = () => {
 
           {currentStep === "consent" && (
             <CandidateConsentScreen
-              companyName="Acme Inc"
-              jobTitle="Senior Frontend Developer"
+              companyName={companyBranding.name}
+              jobTitle={companyBranding.jobTitle}
               duration={25}
               questionCount={8}
               retentionPeriod="90 days"
