@@ -13,6 +13,7 @@ import CandidateExperience from "./pages/CandidateExperience";
 import Integrations from "./pages/Integrations";
 import Settings from "./pages/Settings";
 import AIAnalytics from "./pages/AIAnalytics";
+import CompanyOnboarding from "./pages/CompanyOnboarding";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/onboarding" element={<CompanyOnboarding />} />
           <Route path="/create" element={<CreateInterview />} />
           <Route path="/interviews" element={<InterviewMonitoring />} />
           <Route path="/interviews/:id" element={<InterviewDetail />} />
