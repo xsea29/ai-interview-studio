@@ -351,7 +351,7 @@ export default function BillingPlans() {
 
       {/* Create Plan Dialog */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Create New Plan</DialogTitle>
             <DialogDescription>
@@ -359,7 +359,7 @@ export default function BillingPlans() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-6 py-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Plan Name</Label>
                 <Input
@@ -391,7 +391,7 @@ export default function BillingPlans() {
             </div>
             <div className="space-y-2">
               <Label>Features</Label>
-              <div className="grid grid-cols-2 gap-3 p-4 rounded-lg bg-muted/50">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-lg bg-muted/50 max-h-48 overflow-y-auto">
                 {allFeatures.map((feature) => (
                   <div key={feature} className="flex items-center gap-2">
                     <Checkbox
@@ -404,14 +404,14 @@ export default function BillingPlans() {
               </div>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => setIsCreateOpen(false)} className="w-full sm:w-auto">
               Cancel
             </Button>
             <Button
               onClick={handleCreatePlan}
               disabled={!newPlan.name}
-              className="ai-gradient text-primary-foreground"
+              className="ai-gradient text-primary-foreground w-full sm:w-auto"
             >
               Create Plan
             </Button>
