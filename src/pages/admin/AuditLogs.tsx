@@ -301,89 +301,93 @@ export default function AuditLogs() {
       </Card>
 
       {/* Logs Table */}
-      <Card className="card-elevated">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[160px]">Timestamp</TableHead>
-              <TableHead>Actor</TableHead>
-              <TableHead>Action</TableHead>
-              <TableHead>Target</TableHead>
-              <TableHead>IP Address</TableHead>
-              <TableHead className="w-[100px]">Result</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredLogs.map((log) => (
-              <TableRow key={log.id} className={log.result === "failure" ? "bg-destructive/5" : ""}>
-                <TableCell className="font-mono text-sm text-muted-foreground">
-                  {log.timestamp}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant="secondary"
-                      className={`text-xs ${actorTypeIcons[log.actor.type].className}`}
-                    >
-                      {actorTypeIcons[log.actor.type].label}
-                    </Badge>
-                    <div>
-                      <p className="font-medium text-sm">{log.actor.name}</p>
-                      {log.actor.email && (
-                        <p className="text-xs text-muted-foreground">{log.actor.email}</p>
-                      )}
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className={actionTypeColors[log.actionType] || "bg-muted text-muted-foreground"}
-                  >
-                    {log.actionType}
-                  </Badge>
-                  {log.details && (
-                    <p className="text-xs text-muted-foreground mt-1 max-w-xs truncate">
-                      {log.details}
-                    </p>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm">{log.targetEntity}</span>
-                </TableCell>
-                <TableCell>
-                  <code className="text-xs bg-muted px-1.5 py-0.5 rounded">
-                    {log.ipAddress}
-                  </code>
-                </TableCell>
-                <TableCell>
-                  {log.result === "success" ? (
-                    <Badge variant="outline" className="bg-success/15 text-success border-success/30">
-                      <Check className="h-3 w-3 mr-1" />
-                      Success
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline" className="bg-destructive/15 text-destructive border-destructive/30">
-                      <X className="h-3 w-3 mr-1" />
-                      Failure
-                    </Badge>
-                  )}
-                </TableCell>
+      <Card className="card-elevated overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[140px] min-w-[140px]">Timestamp</TableHead>
+                <TableHead className="min-w-[180px]">Actor</TableHead>
+                <TableHead className="min-w-[160px]">Action</TableHead>
+                <TableHead className="min-w-[180px] hidden lg:table-cell">Target</TableHead>
+                <TableHead className="min-w-[120px] hidden md:table-cell">IP Address</TableHead>
+                <TableHead className="w-[100px]">Result</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredLogs.map((log) => (
+                <TableRow key={log.id} className={log.result === "failure" ? "bg-destructive/5" : ""}>
+                  <TableCell className="font-mono text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+                    {log.timestamp}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant="secondary"
+                        className={`text-[10px] sm:text-xs shrink-0 ${actorTypeIcons[log.actor.type].className}`}
+                      >
+                        {actorTypeIcons[log.actor.type].label}
+                      </Badge>
+                      <div className="min-w-0">
+                        <p className="font-medium text-xs sm:text-sm truncate">{log.actor.name}</p>
+                        {log.actor.email && (
+                          <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{log.actor.email}</p>
+                        )}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant="outline"
+                      className={`text-[10px] sm:text-xs ${actionTypeColors[log.actionType] || "bg-muted text-muted-foreground"}`}
+                    >
+                      {log.actionType}
+                    </Badge>
+                    {log.details && (
+                      <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 max-w-[200px] truncate">
+                        {log.details}
+                      </p>
+                    )}
+                  </TableCell>
+                  <TableCell className="hidden lg:table-cell">
+                    <span className="text-xs sm:text-sm">{log.targetEntity}</span>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    <code className="text-[10px] sm:text-xs bg-muted px-1.5 py-0.5 rounded">
+                      {log.ipAddress}
+                    </code>
+                  </TableCell>
+                  <TableCell>
+                    {log.result === "success" ? (
+                      <Badge variant="outline" className="bg-success/15 text-success border-success/30 text-[10px] sm:text-xs">
+                        <Check className="h-3 w-3 mr-0.5 sm:mr-1" />
+                        <span className="hidden sm:inline">Success</span>
+                        <span className="sm:hidden">OK</span>
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-destructive/15 text-destructive border-destructive/30 text-[10px] sm:text-xs">
+                        <X className="h-3 w-3 mr-0.5 sm:mr-1" />
+                        <span className="hidden sm:inline">Failure</span>
+                        <span className="sm:hidden">Fail</span>
+                      </Badge>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
 
         {/* Pagination */}
-        <div className="p-4 border-t border-border flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
+        <div className="p-3 sm:p-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Showing {filteredLogs.length} of {mockLogs.length} events
           </p>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" disabled>
+            <Button variant="outline" size="sm" disabled className="text-xs">
               Previous
             </Button>
-            <Button variant="outline" size="sm" disabled>
+            <Button variant="outline" size="sm" disabled className="text-xs">
               Next
             </Button>
           </div>

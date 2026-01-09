@@ -30,25 +30,25 @@ const Settings = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container py-8 max-w-4xl">
-        <div className="flex items-center justify-between mb-8">
+      <main className="container py-4 sm:py-8 px-4 sm:px-6 max-w-4xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-            <p className="text-muted-foreground mt-0.5">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Settings</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
               Configure your AI Interview platform
             </p>
           </div>
-          <Button onClick={handleSave}>
+          <Button onClick={handleSave} className="w-full sm:w-auto">
             <Save className="h-4 w-4 mr-2" />
             Save Changes
           </Button>
         </div>
 
-        <Tabs defaultValue="general" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="data">Data & Privacy</TabsTrigger>
-            <TabsTrigger value="team">Team & Roles</TabsTrigger>
+        <Tabs defaultValue="general" className="space-y-4 sm:space-y-6">
+          <TabsList className="grid w-full grid-cols-3 h-auto">
+            <TabsTrigger value="general" className="text-xs sm:text-sm py-2">General</TabsTrigger>
+            <TabsTrigger value="data" className="text-xs sm:text-sm py-2">Data & Privacy</TabsTrigger>
+            <TabsTrigger value="team" className="text-xs sm:text-sm py-2">Team & Roles</TabsTrigger>
           </TabsList>
 
           <TabsContent value="general" className="space-y-6">

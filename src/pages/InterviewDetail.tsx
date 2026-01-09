@@ -66,76 +66,76 @@ const InterviewDetail = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container py-8">
+      <main className="container py-4 sm:py-8 px-4 sm:px-6">
         {/* Back button and header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+          <div className="flex items-center gap-3 sm:gap-4">
             <Link to="/interviews">
-              <Button variant="ghost" size="icon" className="text-muted-foreground">
+              <Button variant="ghost" size="icon" className="text-muted-foreground shrink-0">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
             <div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-semibold tracking-tight">{mockInterview.title}</h1>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <h1 className="text-lg sm:text-2xl font-semibold tracking-tight">{mockInterview.title}</h1>
                 <Badge variant={mockInterview.status === "active" ? "default" : "secondary"}>
                   {mockInterview.status === "active" ? "Active" : "Closed"}
                 </Badge>
               </div>
-              <p className="text-muted-foreground mt-0.5">
+              <p className="text-sm text-muted-foreground mt-0.5">
                 {mockInterview.department} • Created {mockInterview.createdAt}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={copyLink}>
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <Button variant="outline" size="sm" onClick={copyLink} className="flex-1 sm:flex-none">
               <Copy className="h-4 w-4 mr-2" />
               Copy Link
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
               <Send className="h-4 w-4 mr-2" />
-              Send Reminders
+              Reminders
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
               <Download className="h-4 w-4 mr-2" />
-              Export Reports
+              Export
             </Button>
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Left column - Overview */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Progress Card */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
               <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Interview Progress</CardTitle>
+                <CardHeader className="pb-3 sm:pb-6">
+                  <CardTitle className="text-base sm:text-lg">Interview Progress</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-3xl font-bold">{completionRate}%</span>
-                      <span className="text-muted-foreground">
+                      <span className="text-2xl sm:text-3xl font-bold">{completionRate}%</span>
+                      <span className="text-sm text-muted-foreground">
                         {mockInterview.completed} of {mockInterview.totalCandidates} completed
                       </span>
                     </div>
                     <Progress value={completionRate} className="h-2" />
-                    <div className="grid grid-cols-3 gap-4 pt-2">
-                      <div className="text-center p-3 rounded-lg bg-green-500/10">
-                        <div className="text-2xl font-semibold text-green-600">{mockInterview.completed}</div>
-                        <div className="text-xs text-muted-foreground">Completed</div>
+                    <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-2">
+                      <div className="text-center p-2 sm:p-3 rounded-lg bg-success/10">
+                        <div className="text-xl sm:text-2xl font-semibold text-success">{mockInterview.completed}</div>
+                        <div className="text-[10px] sm:text-xs text-muted-foreground">Completed</div>
                       </div>
-                      <div className="text-center p-3 rounded-lg bg-amber-500/10">
-                        <div className="text-2xl font-semibold text-amber-600">{mockInterview.inProgress}</div>
-                        <div className="text-xs text-muted-foreground">In Progress</div>
+                      <div className="text-center p-2 sm:p-3 rounded-lg bg-warning/10">
+                        <div className="text-xl sm:text-2xl font-semibold text-warning">{mockInterview.inProgress}</div>
+                        <div className="text-[10px] sm:text-xs text-muted-foreground">In Progress</div>
                       </div>
-                      <div className="text-center p-3 rounded-lg bg-muted">
-                        <div className="text-2xl font-semibold text-muted-foreground">{mockInterview.notStarted}</div>
-                        <div className="text-xs text-muted-foreground">Not Started</div>
+                      <div className="text-center p-2 sm:p-3 rounded-lg bg-muted">
+                        <div className="text-xl sm:text-2xl font-semibold text-muted-foreground">{mockInterview.notStarted}</div>
+                        <div className="text-[10px] sm:text-xs text-muted-foreground">Not Started</div>
                       </div>
                     </div>
                   </div>
@@ -150,17 +150,17 @@ const InterviewDetail = () => {
               transition={{ delay: 0.1 }}
             >
               <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Candidates</CardTitle>
-                    <div className="flex gap-2">
+                <CardHeader className="pb-3 sm:pb-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <CardTitle className="text-base sm:text-lg">Candidates</CardTitle>
+                    <div className="flex gap-1 sm:gap-2 overflow-x-auto pb-1">
                       {["all", "completed", "in_progress", "not_started"].map((f) => (
                         <Button
                           key={f}
                           variant={filter === f ? "default" : "ghost"}
                           size="sm"
                           onClick={() => setFilter(f as typeof filter)}
-                          className="text-xs"
+                          className="text-[10px] sm:text-xs whitespace-nowrap px-2 sm:px-3"
                         >
                           {f === "all" ? "All" : f === "in_progress" ? "In Progress" : f === "not_started" ? "Not Started" : "Completed"}
                         </Button>
@@ -173,48 +173,48 @@ const InterviewDetail = () => {
                     {filteredCandidates.map((candidate) => (
                       <div
                         key={candidate.id}
-                        className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                        className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors gap-3"
                       >
-                        <div className="flex items-center gap-4">
-                          <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
-                            candidate.status === "completed" ? "bg-green-500/10" :
-                            candidate.status === "in_progress" ? "bg-amber-500/10" : "bg-muted"
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          <div className={`h-8 w-8 sm:h-10 sm:w-10 rounded-full flex items-center justify-center shrink-0 ${
+                            candidate.status === "completed" ? "bg-success/10" :
+                            candidate.status === "in_progress" ? "bg-warning/10" : "bg-muted"
                           }`}>
                             {candidate.status === "completed" ? (
-                              <CheckCircle className="h-5 w-5 text-green-600" />
+                              <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-success" />
                             ) : candidate.status === "in_progress" ? (
-                              <Play className="h-5 w-5 text-amber-600" />
+                              <Play className="h-4 w-4 sm:h-5 sm:w-5 text-warning" />
                             ) : (
-                              <Circle className="h-5 w-5 text-muted-foreground" />
+                              <Circle className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
                             )}
                           </div>
-                          <div>
-                            <div className="font-medium">{candidate.name}</div>
-                            <div className="text-sm text-muted-foreground">{candidate.email}</div>
+                          <div className="min-w-0">
+                            <div className="font-medium text-sm sm:text-base truncate">{candidate.name}</div>
+                            <div className="text-xs sm:text-sm text-muted-foreground truncate">{candidate.email}</div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center justify-end gap-3 sm:gap-4 ml-11 sm:ml-0">
                           {candidate.status === "completed" && (
                             <>
                               <div className="text-right">
-                                <div className="font-semibold text-primary">{candidate.score}%</div>
-                                <div className="text-xs text-muted-foreground">{candidate.completedAt}</div>
+                                <div className="font-semibold text-primary text-sm sm:text-base">{candidate.score}%</div>
+                                <div className="text-[10px] sm:text-xs text-muted-foreground">{candidate.completedAt}</div>
                               </div>
                               <Link to={`/report/${candidate.id}`}>
-                                <Button variant="outline" size="sm">
+                                <Button variant="outline" size="sm" className="text-xs">
                                   View Report
                                 </Button>
                               </Link>
                             </>
                           )}
                           {candidate.status === "in_progress" && (
-                            <Badge variant="secondary" className="bg-amber-500/10 text-amber-600">
+                            <Badge variant="secondary" className="bg-warning/10 text-warning text-xs">
                               In Progress
                             </Badge>
                           )}
                           {candidate.status === "not_started" && (
-                            <Button variant="ghost" size="sm">
-                              <Send className="h-4 w-4 mr-2" />
+                            <Button variant="ghost" size="sm" className="text-xs">
+                              <Send className="h-3.5 w-3.5 mr-1.5" />
                               Remind
                             </Button>
                           )}
@@ -228,7 +228,7 @@ const InterviewDetail = () => {
           </div>
 
           {/* Right column - Config */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Interview Link */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}

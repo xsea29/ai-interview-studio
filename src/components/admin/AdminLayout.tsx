@@ -14,6 +14,8 @@ import {
   LogOut,
   Settings,
   ChevronDown,
+  Menu,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,7 +26,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const navItems = [
   { label: "Organizations", path: "/admin/organizations", icon: Building2 },
@@ -41,12 +43,13 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
   const getBreadcrumbs = () => {
     const path = location.pathname;
     const parts = path.split("/").filter(Boolean);
-    const breadcrumbs = [{ label: "Platform Admin", path: "/admin" }];
+    const breadcrumbs = [{ label: "Admin", path: "/admin" }];
 
     if (parts.length > 1) {
       const currentNav = navItems.find((item) => item.path === path || path.startsWith(item.path));
@@ -62,12 +65,51 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     return breadcrumbs;
   };
 
+  const SidebarContent = ({ onLinkClick }: { onLinkClick?: () => void }) => (
+    <>
+      {/* Logo */}
+      <div className="h-16 flex items-center px-4 border-b border-sidebar-border">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg ai-gradient flex items-center justify-center">
+            <Shield className="h-4 w-4 text-sidebar-primary-foreground" />
+          </div>
+          <span className="font-semibold text-sidebar-primary">
+            Platform Admin
+          </span>
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 py-4 px-2 space-y-1">
+        {navItems.map((item) => {
+          const isActive = location.pathname.startsWith(item.path);
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              onClick={onLinkClick}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors",
+                isActive
+                  ? "bg-sidebar-accent text-sidebar-primary"
+                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+              )}
+            >
+              <item.icon className="h-5 w-5 flex-shrink-0" />
+              <span className="text-sm font-medium">{item.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
+    </>
+  );
+
   return (
     <div className="min-h-screen flex w-full bg-background">
-      {/* Sidebar */}
+      {/* Desktop Sidebar */}
       <aside
         className={cn(
-          "bg-sidebar text-sidebar-foreground flex flex-col transition-all duration-300 border-r border-sidebar-border",
+          "hidden md:flex bg-sidebar text-sidebar-foreground flex-col transition-all duration-300 border-r border-sidebar-border",
           collapsed ? "w-16" : "w-64"
         )}
       >
@@ -123,40 +165,55 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="h-16 border-b border-border bg-card px-6 flex items-center justify-between">
-          {/* Breadcrumbs */}
-          <nav className="flex items-center gap-2 text-sm">
-            {getBreadcrumbs().map((crumb, index, arr) => (
-              <div key={crumb.path} className="flex items-center gap-2">
-                {index > 0 && <span className="text-muted-foreground">/</span>}
-                {index === arr.length - 1 ? (
-                  <span className="font-medium text-foreground">{crumb.label}</span>
-                ) : (
-                  <Link
-                    to={crumb.path}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {crumb.label}
-                  </Link>
-                )}
-              </div>
-            ))}
-          </nav>
+        <header className="h-14 sm:h-16 border-b border-border bg-card px-4 sm:px-6 flex items-center justify-between gap-4">
+          {/* Mobile Menu + Breadcrumbs */}
+          <div className="flex items-center gap-3">
+            {/* Mobile Menu */}
+            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden shrink-0">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-64 p-0 bg-sidebar text-sidebar-foreground">
+                <SidebarContent onLinkClick={() => setMobileOpen(false)} />
+              </SheetContent>
+            </Sheet>
+
+            {/* Breadcrumbs */}
+            <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm overflow-hidden">
+              {getBreadcrumbs().map((crumb, index, arr) => (
+                <div key={crumb.path} className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                  {index > 0 && <span className="text-muted-foreground">/</span>}
+                  {index === arr.length - 1 ? (
+                    <span className="font-medium text-foreground truncate">{crumb.label}</span>
+                  ) : (
+                    <Link
+                      to={crumb.path}
+                      className="text-muted-foreground hover:text-foreground transition-colors truncate"
+                    >
+                      {crumb.label}
+                    </Link>
+                  )}
+                </div>
+              ))}
+            </nav>
+          </div>
 
           {/* Account Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-primary text-primary-foreground text-sm">
+              <Button variant="ghost" className="flex items-center gap-2 shrink-0">
+                <Avatar className="h-7 w-7 sm:h-8 sm:w-8">
+                  <AvatarFallback className="bg-primary text-primary-foreground text-xs sm:text-sm">
                     PA
                   </AvatarFallback>
                 </Avatar>
-                <div className="hidden md:flex flex-col items-start">
+                <div className="hidden lg:flex flex-col items-start">
                   <span className="text-sm font-medium">Platform Admin</span>
                   <span className="text-xs text-muted-foreground">admin@platform.io</span>
                 </div>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                <ChevronDown className="h-4 w-4 text-muted-foreground hidden sm:block" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
@@ -178,7 +235,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto p-4 sm:p-6">
           {children || <Outlet />}
         </main>
       </div>
