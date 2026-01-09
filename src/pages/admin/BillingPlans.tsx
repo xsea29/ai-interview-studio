@@ -351,7 +351,7 @@ export default function BillingPlans() {
 
       {/* Create Plan Dialog */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-thumb]:rounded-full">
           <DialogHeader>
             <DialogTitle>Create New Plan</DialogTitle>
             <DialogDescription>
@@ -391,7 +391,7 @@ export default function BillingPlans() {
             </div>
             <div className="space-y-2">
               <Label>Features</Label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-lg bg-muted/50 max-h-48 overflow-y-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-lg bg-muted/50 max-h-48 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-thumb]:rounded-full">
                 {allFeatures.map((feature) => (
                   <div key={feature} className="flex items-center gap-2">
                     <Checkbox
