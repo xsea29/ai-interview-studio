@@ -174,7 +174,7 @@ export function CandidateImport({ candidates, setCandidates, onNext }: Candidate
   ];
 
   return (
-    <div className="w-full">
+    <div className="max-w-4xl mx-auto">
       {/* Tabs - scrollable on mobile */}
       <div className="flex gap-1 p-1 bg-muted rounded-xl mb-4 sm:mb-6 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 sm:inline-flex">
         {tabs.map((tab) => (

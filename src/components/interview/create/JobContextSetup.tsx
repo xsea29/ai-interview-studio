@@ -71,7 +71,7 @@ export function JobContextSetup({ data, setData, onNext, onBack }: JobContextSet
   const isValid = data.title.trim() !== "" && data.interviewType;
 
   return (
-    <div className="w-full">
+    <div className="max-w-4xl mx-auto">
       <div className="rounded-lg sm:rounded-xl bg-card border border-border card-elevated p-4 sm:p-6">
         {/* Info banner */}
         <div className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 bg-accent/50 rounded-lg mb-4 sm:mb-6">
