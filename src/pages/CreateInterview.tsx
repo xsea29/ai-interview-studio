@@ -253,7 +253,7 @@ function AccessNotifyStep({
   onBack,
 }: AccessNotifyStepProps) {
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="w-full space-y-6">
       <div>
         <h2 className="text-lg font-semibold mb-1">Access & Notifications</h2>
         <p className="text-sm text-muted-foreground">
