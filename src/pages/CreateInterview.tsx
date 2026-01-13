@@ -124,14 +124,14 @@ const CreateInterview = () => {
           </div>
         </div>
 
-        {/* Progress steps - Mobile: horizontal scrollable, compact */}
-        <div className="mb-6 sm:mb-8 -mx-4 px-4 sm:mx-0 sm:px-0">
-          <div className="flex items-center gap-2 sm:gap-0 sm:justify-between max-w-2xl overflow-x-auto pb-2 sm:pb-0">
+        {/* Progress steps - Full width, no scroll */}
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center justify-between w-full">
             {steps.map((step, index) => (
-              <div key={step.id} className="flex items-center flex-shrink-0">
+              <div key={step.id} className="flex items-center flex-1">
                 <div className="flex items-center gap-2 sm:gap-3">
                   <div
-                    className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full border-2 transition-all ${
+                    className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full border-2 transition-all flex-shrink-0 ${
                       currentStep > step.id
                         ? "bg-primary border-primary"
                         : currentStep === step.id
@@ -155,7 +155,7 @@ const CreateInterview = () => {
                     </div>
                     <div className="text-xs text-muted-foreground">{step.description}</div>
                   </div>
-                  {/* Mobile step name - shown below the circle */}
+                  {/* Mobile step name */}
                   <div className="sm:hidden">
                     <div
                       className={`text-xs font-medium whitespace-nowrap ${
@@ -168,7 +168,7 @@ const CreateInterview = () => {
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`w-8 sm:w-16 lg:w-24 h-0.5 mx-2 sm:mx-4 ${
+                    className={`flex-1 h-0.5 mx-2 sm:mx-4 ${
                       currentStep > step.id ? "bg-primary" : "bg-border"
                     }`}
                   />
@@ -253,7 +253,7 @@ function AccessNotifyStep({
   onBack,
 }: AccessNotifyStepProps) {
   return (
-    <div className="w-full space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
       <div>
         <h2 className="text-lg font-semibold mb-1">Access & Notifications</h2>
         <p className="text-sm text-muted-foreground">
