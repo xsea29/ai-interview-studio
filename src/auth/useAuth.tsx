@@ -45,36 +45,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user?.id]);
 
   React.useEffect(() => {
-    // IMPORTANT: listener first, then getSession
+    let isMounted = true;
+
+    // Get initial session first
+    const initializeAuth = async () => {
+      try {
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        
+        if (!isMounted) return;
+        
+        setSession(initialSession);
+        setUser(initialSession?.user ?? null);
+        
+        if (initialSession?.user?.id) {
+          const initialRole = await fetchMyRole(initialSession.user.id);
+          if (isMounted) setRole(initialRole);
+        }
+      } catch (error) {
+        console.error("Auth initialization error:", error);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    initializeAuth();
+
+    // Set up listener for future auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
+      if (!isMounted) return;
+      
       setSession(nextSession);
       setUser(nextSession?.user ?? null);
 
       if (nextSession?.user?.id) {
         const nextRole = await fetchMyRole(nextSession.user.id);
-        setRole(nextRole);
+        if (isMounted) setRole(nextRole);
       } else {
         setRole(null);
       }
-
-      setLoading(false);
     });
 
-    supabase.auth
-      .getSession()
-      .then(async ({ data }) => {
-        setSession(data.session);
-        setUser(data.session?.user ?? null);
-        if (data.session?.user?.id) {
-          const nextRole = await fetchMyRole(data.session.user.id);
-          setRole(nextRole);
-        }
-      })
-      .finally(() => setLoading(false));
-
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = React.useCallback(async () => {
