@@ -16,6 +16,20 @@ type AuthState = {
 
 const AuthContext = React.createContext<AuthState | null>(null);
 
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  let timeoutId: number | undefined;
+
+  const timeout = new Promise<T>((_resolve, reject) => {
+    timeoutId = window.setTimeout(() => {
+      reject(new Error(`${label} timed out after ${ms}ms`));
+    }, ms);
+  });
+
+  return Promise.race([promise, timeout]).finally(() => {
+    if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+  }) as Promise<T>;
+}
+
 async function fetchMyRole(userId: string): Promise<AppRole | null> {
   const { data, error } = await supabase
     .from("user_roles")
@@ -40,8 +54,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setRole(null);
       return;
     }
-    const nextRole = await fetchMyRole(user.id);
-    setRole(nextRole);
+    try {
+      const nextRole = await withTimeout(fetchMyRole(user.id), 7000, "refreshRole");
+      setRole(nextRole);
+    } catch (error) {
+      console.error("refreshRole error:", error);
+      setRole(null);
+    }
   }, [user?.id]);
 
   React.useEffect(() => {
@@ -50,7 +69,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Get initial session first
     const initializeAuth = async () => {
       try {
-        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        const {
+          data: { session: initialSession },
+        } = await withTimeout(supabase.auth.getSession(), 7000, "getSession");
         
         if (!isMounted) return;
         
@@ -58,8 +79,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(initialSession?.user ?? null);
         
         if (initialSession?.user?.id) {
-          const initialRole = await fetchMyRole(initialSession.user.id);
-          if (isMounted) setRole(initialRole);
+          try {
+            const initialRole = await withTimeout(
+              fetchMyRole(initialSession.user.id),
+              7000,
+              "fetchMyRole (initial)"
+            );
+            if (isMounted) setRole(initialRole);
+          } catch (error) {
+            console.error("Initial role fetch error:", error);
+            if (isMounted) setRole(null);
+          }
         }
       } catch (error) {
         console.error("Auth initialization error:", error);
@@ -80,8 +110,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(nextSession?.user ?? null);
 
       if (nextSession?.user?.id) {
-        const nextRole = await fetchMyRole(nextSession.user.id);
-        if (isMounted) setRole(nextRole);
+        try {
+          const nextRole = await withTimeout(
+            fetchMyRole(nextSession.user.id),
+            7000,
+            "fetchMyRole (auth change)"
+          );
+          if (isMounted) setRole(nextRole);
+        } catch (error) {
+          console.error("Role fetch error (auth change):", error);
+          if (isMounted) setRole(null);
+        }
       } else {
         setRole(null);
       }
