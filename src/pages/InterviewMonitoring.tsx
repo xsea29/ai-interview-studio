@@ -18,7 +18,14 @@ import {
   ShieldAlert,
   AlertTriangle,
   ChevronDown,
-  Database
+  Database,
+  Eye,
+  Mail,
+  RefreshCw,
+  Ban,
+  Star,
+  Trash2,
+  Copy
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
@@ -482,9 +489,59 @@ const InterviewMonitoring = () => {
                               </Button>
                             </Link>
                           )}
-                          <Button variant="ghost" size="icon" className="text-muted-foreground">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="text-muted-foreground">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48">
+                              <DropdownMenuItem onClick={() => toast.info(`Viewing details for ${interview.candidateName}`)}>
+                                <Eye className="h-4 w-4 mr-2" />
+                                View Details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => {
+                                navigator.clipboard.writeText(interview.email);
+                                toast.success("Email copied to clipboard");
+                              }}>
+                                <Copy className="h-4 w-4 mr-2" />
+                                Copy Email
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              {interview.status === "not_started" && (
+                                <DropdownMenuItem onClick={() => toast.success(`Reminder sent to ${interview.candidateName}`)}>
+                                  <Mail className="h-4 w-4 mr-2" />
+                                  Send Reminder
+                                </DropdownMenuItem>
+                              )}
+                              {interview.status === "completed" && (
+                                <>
+                                  <DropdownMenuItem onClick={() => toast.success(`${interview.candidateName} shortlisted`)}>
+                                    <Star className="h-4 w-4 mr-2" />
+                                    Shortlist
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => toast.info(`Re-evaluating ${interview.candidateName}`)}>
+                                    <RefreshCw className="h-4 w-4 mr-2" />
+                                    Re-evaluate
+                                  </DropdownMenuItem>
+                                </>
+                              )}
+                              {interview.status !== "completed" && (
+                                <DropdownMenuItem onClick={() => toast.warning(`Interview cancelled for ${interview.candidateName}`)}>
+                                  <Ban className="h-4 w-4 mr-2" />
+                                  Cancel Interview
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                className="text-destructive focus:text-destructive"
+                                onClick={() => toast.error(`${interview.candidateName} removed from campaign`)}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Remove
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </td>
                     </tr>
