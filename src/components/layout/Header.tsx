@@ -1,9 +1,15 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Brain, Bell, Settings, User, Link2, Menu, Shield, Building2 } from "lucide-react";
+import { Brain, Bell, Settings, User, Link2, Menu, Shield, Building2, ChevronDown, Users, Briefcase } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function Header() {
   const location = useLocation();
@@ -14,11 +20,17 @@ export function Header() {
     return location.pathname.startsWith(path);
   };
 
+  const isInterviewActive = location.pathname.startsWith("/interviews");
+
   const navLinks = [
     { path: "/", label: "Dashboard" },
-    { path: "/interviews", label: "Interviews" },
     { path: "/analytics", label: "Analytics" },
     { path: "/integrations", label: "Integrations", icon: Link2 },
+  ];
+
+  const interviewSubLinks = [
+    { path: "/interviews/candidates", label: "Candidates", icon: Users },
+    { path: "/interviews/jobs", label: "Jobs", icon: Briefcase },
   ];
 
   return (
@@ -57,6 +69,28 @@ export function Header() {
                       {link.label}
                     </Link>
                   ))}
+                  {/* Mobile Interview Section */}
+                  <div className="pt-2">
+                    <p className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Interviews
+                    </p>
+                    {interviewSubLinks.map((link) => (
+                      <Link
+                        key={link.path}
+                        to={link.path}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={cn(
+                          "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                          isActive(link.path)
+                            ? "bg-primary/10 text-primary"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                        )}
+                      >
+                        <link.icon className="h-4 w-4" />
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
                 </nav>
                 <div className="p-4 border-t border-border">
                   <Link
@@ -86,7 +120,54 @@ export function Header() {
         </div>
         
         <nav className="hidden md:flex items-center gap-1">
-          {navLinks.map((link) => (
+          {navLinks.slice(0, 1).map((link) => (
+            <Link key={link.path} to={link.path}>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className={cn(
+                  "text-muted-foreground hover:text-foreground",
+                  isActive(link.path) && "text-foreground bg-muted"
+                )}
+              >
+                {link.icon && <link.icon className="h-4 w-4 mr-1.5" />}
+                {link.label}
+              </Button>
+            </Link>
+          ))}
+          
+          {/* Interview Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className={cn(
+                  "text-muted-foreground hover:text-foreground gap-1",
+                  isInterviewActive && "text-foreground bg-muted"
+                )}
+              >
+                Interviews
+                <ChevronDown className="h-3.5 w-3.5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-44 bg-popover border border-border">
+              <DropdownMenuItem asChild className="cursor-pointer">
+                <Link to="/interviews/candidates" className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Candidates
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild className="cursor-pointer">
+                <Link to="/interviews/jobs" className="flex items-center gap-2">
+                  <Briefcase className="h-4 w-4" />
+                  Jobs
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {navLinks.slice(1).map((link) => (
             <Link key={link.path} to={link.path}>
               <Button 
                 variant="ghost" 
