@@ -6,6 +6,7 @@ import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { CandidateImport } from "@/components/interview/create/CandidateImport";
 import { JobContextSetup } from "@/components/interview/create/JobContextSetup";
+import { QuestionGeneration, InterviewQuestion } from "@/components/interview/create/QuestionGeneration";
 import { AccessPolicyConfig, AccessPolicy } from "@/components/interview/create/AccessPolicyConfig";
 import { NotificationConfig, NotificationSettings } from "@/components/interview/create/NotificationConfig";
 import { ReviewLaunch } from "@/components/interview/create/ReviewLaunch";
@@ -40,8 +41,9 @@ export interface DeliveryMethod {
 const steps = [
   { id: 1, name: "Import Candidates", description: "Upload or enter candidates" },
   { id: 2, name: "Job Context", description: "Configure AI interview" },
-  { id: 3, name: "Access & Notify", description: "Rules and notifications" },
-  { id: 4, name: "Review & Launch", description: "Confirm and send" },
+  { id: 3, name: "Questions", description: "Generate & edit questions" },
+  { id: 4, name: "Access & Notify", description: "Rules and notifications" },
+  { id: 5, name: "Review & Launch", description: "Confirm and send" },
 ];
 
 const CreateInterview = () => {
@@ -78,9 +80,10 @@ const CreateInterview = () => {
     onFailure: true,
   });
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>({ type: "email" });
+  const [questions, setQuestions] = useState<InterviewQuestion[]>([]);
 
   const handleNext = () => {
-    if (currentStep < 4) {
+    if (currentStep < 5) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -203,6 +206,15 @@ const CreateInterview = () => {
               />
             )}
             {currentStep === 3 && (
+              <QuestionGeneration
+                jobContext={jobContext}
+                questions={questions}
+                setQuestions={setQuestions}
+                onNext={handleNext}
+                onBack={handleBack}
+              />
+            )}
+            {currentStep === 4 && (
               <AccessNotifyStep
                 accessPolicy={accessPolicy}
                 setAccessPolicy={setAccessPolicy}
@@ -213,7 +225,7 @@ const CreateInterview = () => {
                 onBack={handleBack}
               />
             )}
-            {currentStep === 4 && (
+            {currentStep === 5 && (
               <ReviewLaunch
                 candidates={candidates}
                 jobContext={jobContext}
