@@ -12,6 +12,7 @@ import LoginClient from "./pages/LoginClient";
 import LoginAdmin from "./pages/LoginAdmin";
 import CreateInterview from "./pages/CreateInterview";
 import InterviewMonitoring from "./pages/InterviewMonitoring";
+import InterviewJobs from "./pages/InterviewJobs";
 import InterviewDetail from "./pages/InterviewDetail";
 import InterviewReadiness from "./pages/InterviewReadiness";
 import EvaluationReport from "./pages/EvaluationReport";
@@ -74,9 +75,21 @@ const App = () => (
             />
             <Route
               path="/interviews"
+              element={<Navigate to="/interviews/candidates" replace />}
+            />
+            <Route
+              path="/interviews/candidates"
               element={
                 <RequireAuth>
                   <InterviewMonitoring />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/interviews/jobs"
+              element={
+                <RequireAuth>
+                  <InterviewJobs />
                 </RequireAuth>
               }
             />
