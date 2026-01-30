@@ -6,28 +6,33 @@ import { Button } from "@/components/ui/button";
 // Animated floating shapes component
 function FloatingShapes() {
   const shapes = [
-    { type: "circle", size: 80, x: "10%", y: "20%", delay: 0, duration: 20 },
-    { type: "hexagon", size: 60, x: "80%", y: "30%", delay: 2, duration: 25 },
-    { type: "square", size: 40, x: "60%", y: "70%", delay: 1, duration: 18 },
-    { type: "circle", size: 100, x: "85%", y: "80%", delay: 3, duration: 22 },
-    { type: "hexagon", size: 50, x: "25%", y: "75%", delay: 0.5, duration: 24 },
-    { type: "square", size: 30, x: "45%", y: "15%", delay: 1.5, duration: 19 },
-    { type: "circle", size: 45, x: "70%", y: "10%", delay: 2.5, duration: 21 },
-    { type: "hexagon", size: 35, x: "5%", y: "50%", delay: 0.8, duration: 23 },
+    { type: "circle", size: 120, x: "5%", y: "10%", delay: 0, duration: 15 },
+    { type: "hexagon", size: 90, x: "75%", y: "20%", delay: 1, duration: 18 },
+    { type: "square", size: 60, x: "55%", y: "65%", delay: 0.5, duration: 14 },
+    { type: "circle", size: 140, x: "85%", y: "75%", delay: 2, duration: 16 },
+    { type: "hexagon", size: 70, x: "20%", y: "70%", delay: 0.3, duration: 17 },
+    { type: "square", size: 50, x: "40%", y: "5%", delay: 1.2, duration: 13 },
+    { type: "circle", size: 65, x: "65%", y: "5%", delay: 1.8, duration: 15 },
+    { type: "hexagon", size: 55, x: "3%", y: "45%", delay: 0.6, duration: 16 },
+    { type: "dot", size: 8, x: "30%", y: "30%", delay: 0, duration: 10 },
+    { type: "dot", size: 6, x: "50%", y: "50%", delay: 0.5, duration: 12 },
+    { type: "dot", size: 10, x: "70%", y: "40%", delay: 1, duration: 11 },
+    { type: "dot", size: 7, x: "15%", y: "60%", delay: 1.5, duration: 9 },
+    { type: "dot", size: 5, x: "90%", y: "50%", delay: 2, duration: 10 },
   ];
 
   return (
-    <div className="absolute inset-0 overflow-hidden">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
       {shapes.map((shape, i) => (
         <motion.div
           key={i}
-          className="absolute opacity-[0.07]"
+          className={`absolute ${shape.type === "dot" ? "opacity-20" : "opacity-[0.12]"}`}
           style={{ left: shape.x, top: shape.y }}
           animate={{
-            y: [0, -30, 0, 30, 0],
-            x: [0, 20, 0, -20, 0],
-            rotate: [0, 90, 180, 270, 360],
-            scale: [1, 1.1, 1, 0.9, 1],
+            y: [0, -25, 0, 25, 0],
+            x: [0, 15, 0, -15, 0],
+            rotate: shape.type === "dot" ? [0, 0, 0] : [0, 180, 360],
+            scale: [1, 1.15, 1, 0.85, 1],
           }}
           transition={{
             duration: shape.duration,
@@ -38,7 +43,7 @@ function FloatingShapes() {
         >
           {shape.type === "circle" && (
             <div
-              className="rounded-full border-2 border-primary"
+              className="rounded-full border-2 border-primary/80"
               style={{ width: shape.size, height: shape.size }}
             />
           )}
@@ -48,13 +53,20 @@ function FloatingShapes() {
                 points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5"
                 fill="none"
                 stroke="hsl(var(--primary))"
-                strokeWidth="3"
+                strokeWidth="2"
+                opacity="0.8"
               />
             </svg>
           )}
           {shape.type === "square" && (
             <div
-              className="border-2 border-primary rounded-lg"
+              className="border-2 border-primary/80 rounded-lg"
+              style={{ width: shape.size, height: shape.size }}
+            />
+          )}
+          {shape.type === "dot" && (
+            <div
+              className="rounded-full bg-primary"
               style={{ width: shape.size, height: shape.size }}
             />
           )}
@@ -67,19 +79,21 @@ function FloatingShapes() {
 // Animated grid lines
 function AnimatedGrid() {
   return (
-    <div className="absolute inset-0 overflow-hidden opacity-[0.04]">
+    <div className="absolute inset-0 overflow-hidden opacity-[0.08]">
       <svg className="w-full h-full">
         <defs>
-          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="hsl(var(--primary))" strokeWidth="1" />
+          <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+            <path d="M 50 0 L 0 0 0 50" fill="none" stroke="hsl(var(--primary))" strokeWidth="1" />
           </pattern>
         </defs>
         <rect width="100%" height="100%" fill="url(#grid)" />
       </svg>
+      {/* Sweeping highlight */}
       <motion.div
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent"
-        animate={{ x: ["-100%", "100%"] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent"
+        style={{ width: "50%" }}
+        animate={{ x: ["-50%", "200%"] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
       />
     </div>
   );
@@ -88,27 +102,27 @@ function AnimatedGrid() {
 // Flowing energy lines
 function EnergyLines() {
   return (
-    <div className="absolute inset-0 overflow-hidden">
-      {[...Array(3)].map((_, i) => (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {[...Array(5)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute h-px w-full"
-          style={{ top: `${25 + i * 25}%` }}
+          className="absolute h-[2px] w-full"
+          style={{ top: `${15 + i * 18}%` }}
           initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 0.15, 0] }}
+          animate={{ opacity: [0, 0.4, 0] }}
           transition={{
-            duration: 4,
-            delay: i * 1.5,
+            duration: 3,
+            delay: i * 0.8,
             repeat: Infinity,
             ease: "easeInOut",
           }}
         >
           <motion.div
-            className="h-full bg-gradient-to-r from-transparent via-primary to-transparent"
-            animate={{ x: ["-100%", "100%"] }}
+            className="h-full w-1/3 bg-gradient-to-r from-transparent via-primary to-transparent"
+            animate={{ x: ["-100%", "400%"] }}
             transition={{
-              duration: 3,
-              delay: i * 1.5,
+              duration: 2.5,
+              delay: i * 0.8,
               repeat: Infinity,
               ease: "easeOut",
             }}
@@ -122,25 +136,65 @@ function EnergyLines() {
 // Pulsing orbs in background
 function PulsingOrbs() {
   return (
-    <div className="absolute inset-0 overflow-hidden">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
       <motion.div
-        className="absolute w-64 h-64 rounded-full bg-primary/5 blur-3xl"
-        style={{ left: "10%", top: "50%", transform: "translateY(-50%)" }}
-        animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.5, 0.3] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute w-80 h-80 rounded-full bg-primary/10 blur-3xl"
+        style={{ left: "-5%", top: "50%", transform: "translateY(-50%)" }}
+        animate={{ scale: [1, 1.4, 1], opacity: [0.4, 0.7, 0.4] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute w-48 h-48 rounded-full bg-primary/5 blur-3xl"
-        style={{ right: "15%", top: "30%" }}
-        animate={{ scale: [1.2, 1, 1.2], opacity: [0.4, 0.2, 0.4] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        className="absolute w-64 h-64 rounded-full bg-primary/10 blur-3xl"
+        style={{ right: "5%", top: "20%" }}
+        animate={{ scale: [1.3, 1, 1.3], opacity: [0.5, 0.3, 0.5] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
       />
       <motion.div
-        className="absolute w-32 h-32 rounded-full bg-primary/10 blur-2xl"
-        style={{ right: "40%", bottom: "20%" }}
-        animate={{ scale: [1, 1.4, 1], opacity: [0.2, 0.4, 0.2] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        className="absolute w-48 h-48 rounded-full bg-primary/15 blur-2xl"
+        style={{ right: "30%", bottom: "10%" }}
+        animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0.6, 0.3] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
       />
+      <motion.div
+        className="absolute w-40 h-40 rounded-full bg-primary/10 blur-2xl"
+        style={{ left: "40%", top: "10%" }}
+        animate={{ scale: [1.2, 0.9, 1.2], opacity: [0.4, 0.2, 0.4] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+      />
+    </div>
+  );
+}
+
+// Particle field effect
+function ParticleField() {
+  const particles = Array.from({ length: 20 }, (_, i) => ({
+    x: `${Math.random() * 100}%`,
+    y: `${Math.random() * 100}%`,
+    size: 2 + Math.random() * 4,
+    delay: Math.random() * 3,
+    duration: 3 + Math.random() * 4,
+  }));
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {particles.map((p, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full bg-primary"
+          style={{ left: p.x, top: p.y, width: p.size, height: p.size }}
+          animate={{
+            opacity: [0, 0.6, 0],
+            scale: [0.5, 1, 0.5],
+            y: [0, -30, 0],
+          }}
+          transition={{
+            duration: p.duration,
+            delay: p.delay,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
     </div>
   );
 }
@@ -154,6 +208,11 @@ export function CreateInterviewCard() {
       className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-card border border-border p-5 sm:p-8 md:p-10 card-elevated"
     >
       {/* Animated background layers */}
+      <AnimatedGrid />
+      <PulsingOrbs />
+      <FloatingShapes />
+      <EnergyLines />
+      <ParticleField />
       <AnimatedGrid />
       <PulsingOrbs />
       <FloatingShapes />
