@@ -193,13 +193,36 @@ function ParticleField() {
   );
 }
 
+// Glossy sheen effect
+function GlossySheen() {
+  return (
+    <>
+      {/* Top glossy highlight */}
+      <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/[0.08] to-transparent pointer-events-none" />
+      
+      {/* Moving sheen */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none"
+        initial={{ x: "-100%", opacity: 0 }}
+        animate={{ x: "200%", opacity: [0, 0.15, 0] }}
+        transition={{ duration: 4, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }}
+      >
+        <div className="w-1/3 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12" />
+      </motion.div>
+      
+      {/* Soft inner glow on edges */}
+      <div className="absolute inset-0 rounded-xl sm:rounded-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] pointer-events-none" />
+    </>
+  );
+}
+
 export function CreateInterviewCard() {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-card border border-border p-5 sm:p-8 md:p-10 card-elevated"
+      className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-card border border-white/10 p-5 sm:p-8 md:p-10 card-elevated backdrop-blur-sm"
     >
       {/* Animated background layers */}
       <AnimatedGrid />
@@ -208,8 +231,11 @@ export function CreateInterviewCard() {
       <EnergyLines />
       <ParticleField />
       
+      {/* Glossy overlay */}
+      <GlossySheen />
+      
       {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 ai-gradient-subtle opacity-50" />
+      <div className="absolute inset-0 ai-gradient-subtle opacity-30" />
       
       <div className="relative">
         <div className="flex items-start justify-between gap-4 sm:gap-6">
