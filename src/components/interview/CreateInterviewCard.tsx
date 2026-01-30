@@ -26,7 +26,7 @@ function FloatingShapes() {
       {shapes.map((shape, i) => (
         <motion.div
           key={i}
-          className={`absolute ${shape.type === "dot" ? "opacity-20" : "opacity-[0.12]"}`}
+          className={`absolute ${shape.type === "dot" ? "opacity-10" : "opacity-[0.06]"}`}
           style={{ left: shape.x, top: shape.y }}
           animate={{
             y: [0, -25, 0, 25, 0],
@@ -79,7 +79,7 @@ function FloatingShapes() {
 // Animated grid lines
 function AnimatedGrid() {
   return (
-    <div className="absolute inset-0 overflow-hidden opacity-[0.08]">
+    <div className="absolute inset-0 overflow-hidden opacity-[0.04]">
       <svg className="w-full h-full">
         <defs>
           <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
@@ -106,10 +106,10 @@ function EnergyLines() {
       {[...Array(5)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute h-[2px] w-full"
+          className="absolute h-[1px] w-full"
           style={{ top: `${15 + i * 18}%` }}
           initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 0.4, 0] }}
+          animate={{ opacity: [0, 0.2, 0] }}
           transition={{
             duration: 3,
             delay: i * 0.8,
@@ -138,28 +138,22 @@ function PulsingOrbs() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       <motion.div
-        className="absolute w-80 h-80 rounded-full bg-primary/10 blur-3xl"
+        className="absolute w-64 h-64 rounded-full bg-primary/5 blur-3xl"
         style={{ left: "-5%", top: "50%", transform: "translateY(-50%)" }}
-        animate={{ scale: [1, 1.4, 1], opacity: [0.4, 0.7, 0.4] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.35, 0.2] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute w-64 h-64 rounded-full bg-primary/10 blur-3xl"
+        className="absolute w-48 h-48 rounded-full bg-primary/5 blur-3xl"
         style={{ right: "5%", top: "20%" }}
-        animate={{ scale: [1.3, 1, 1.3], opacity: [0.5, 0.3, 0.5] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+        animate={{ scale: [1.2, 1, 1.2], opacity: [0.25, 0.15, 0.25] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
       />
       <motion.div
-        className="absolute w-48 h-48 rounded-full bg-primary/15 blur-2xl"
+        className="absolute w-40 h-40 rounded-full bg-primary/5 blur-2xl"
         style={{ right: "30%", bottom: "10%" }}
-        animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0.6, 0.3] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-      />
-      <motion.div
-        className="absolute w-40 h-40 rounded-full bg-primary/10 blur-2xl"
-        style={{ left: "40%", top: "10%" }}
-        animate={{ scale: [1.2, 0.9, 1.2], opacity: [0.4, 0.2, 0.4] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+        animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.3, 0.15] }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
       />
     </div>
   );
@@ -183,9 +177,9 @@ function ParticleField() {
           className="absolute rounded-full bg-primary"
           style={{ left: p.x, top: p.y, width: p.size, height: p.size }}
           animate={{
-            opacity: [0, 0.6, 0],
+            opacity: [0, 0.3, 0],
             scale: [0.5, 1, 0.5],
-            y: [0, -30, 0],
+            y: [0, -20, 0],
           }}
           transition={{
             duration: p.duration,
@@ -213,10 +207,6 @@ export function CreateInterviewCard() {
       <FloatingShapes />
       <EnergyLines />
       <ParticleField />
-      <AnimatedGrid />
-      <PulsingOrbs />
-      <FloatingShapes />
-      <EnergyLines />
       
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 ai-gradient-subtle opacity-50" />
