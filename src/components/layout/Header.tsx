@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Brain, Bell, Settings, User, Link2, Menu, Shield, Building2, ChevronDown, Users, Briefcase } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Brain, Settings, User, Link2, Menu, Shield, Building2, ChevronDown, Users, Briefcase } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -10,10 +10,29 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { NotificationBell, NotificationCenter, NotificationModal } from "@/components/notifications";
+import { useNotificationContext } from "@/contexts/NotificationContext";
 
 export function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  const {
+    notifications,
+    unreadCount,
+    actionRequiredCount,
+    isOpen: isNotificationCenterOpen,
+    selectedNotification,
+    markAsRead,
+    markAllAsRead,
+    dismissNotification,
+    clearAll,
+    toggleCenter,
+    closeCenter,
+    openNotificationDetail,
+    closeNotificationDetail,
+  } = useNotificationContext();
   
   const isActive = (path: string) => {
     if (path === "/") return location.pathname === "/";
@@ -195,9 +214,10 @@ export function Header() {
               <Shield className="h-4 w-4" />
             </Button>
           </Link>
-          <Button variant="ghost" size="icon" className="text-muted-foreground h-8 w-8 sm:h-9 sm:w-9">
-            <Bell className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
-          </Button>
+          <NotificationBell 
+            unreadCount={unreadCount} 
+            onClick={toggleCenter}
+          />
           <Link to="/settings" className="hidden md:block">
             <Button variant="ghost" size="icon" className="text-muted-foreground">
               <Settings className="h-4.5 w-4.5" />
@@ -208,6 +228,27 @@ export function Header() {
           </div>
         </div>
       </div>
+
+      {/* Notification Center Sidebar */}
+      <NotificationCenter
+        isOpen={isNotificationCenterOpen}
+        onClose={closeCenter}
+        notifications={notifications}
+        unreadCount={unreadCount}
+        actionRequiredCount={actionRequiredCount}
+        onMarkAsRead={markAsRead}
+        onMarkAllAsRead={markAllAsRead}
+        onDismiss={dismissNotification}
+        onClearAll={clearAll}
+        onViewDetails={openNotificationDetail}
+      />
+
+      {/* Notification Detail Modal */}
+      <NotificationModal
+        notification={selectedNotification}
+        isOpen={!!selectedNotification}
+        onClose={closeNotificationDetail}
+      />
     </header>
   );
 }
