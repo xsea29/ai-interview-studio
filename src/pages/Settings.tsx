@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { DataOwnershipSettings } from "@/components/settings/DataOwnershipSettings";
 import { RoleSettings } from "@/components/settings/RoleSettings";
+import { ATSSettings } from "@/components/settings/ATSSettings";
 
 const Settings = () => {
   const [companyName, setCompanyName] = useState("Acme Corp");
@@ -45,8 +46,9 @@ const Settings = () => {
         </div>
 
         <Tabs defaultValue="general" className="space-y-4 sm:space-y-6">
-          <TabsList className="grid w-full grid-cols-3 h-auto">
+          <TabsList className="grid w-full grid-cols-4 h-auto">
             <TabsTrigger value="general" className="text-xs sm:text-sm py-2">General</TabsTrigger>
+            <TabsTrigger value="integrations" className="text-xs sm:text-sm py-2">Integrations</TabsTrigger>
             <TabsTrigger value="data" className="text-xs sm:text-sm py-2">Data & Privacy</TabsTrigger>
             <TabsTrigger value="team" className="text-xs sm:text-sm py-2">Team & Roles</TabsTrigger>
           </TabsList>
@@ -276,6 +278,10 @@ const Settings = () => {
               </CardContent>
             </Card>
           </motion.div>
+          </TabsContent>
+
+          <TabsContent value="integrations" className="space-y-6">
+            <ATSSettings />
           </TabsContent>
 
           <TabsContent value="data" className="space-y-6">

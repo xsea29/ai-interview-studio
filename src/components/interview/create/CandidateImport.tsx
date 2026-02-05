@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CandidateData } from "@/pages/CreateInterview";
 import { MappingTemplates } from "./MappingTemplates";
 import { Badge } from "@/components/ui/badge";
+import { ATSIntegration } from "./ATSIntegration";
 
 interface CandidateImportProps {
   candidates: CandidateData[];
@@ -170,7 +171,7 @@ export function CandidateImport({ candidates, setCandidates, onNext }: Candidate
   const tabs = [
     { id: "csv" as TabType, label: "Upload CSV / Excel", icon: FileSpreadsheet, highlighted: true },
     { id: "paste" as TabType, label: "Paste Emails", icon: Mail },
-    { id: "ats" as TabType, label: "ATS Integration", icon: Link2, comingSoon: true },
+    { id: "ats" as TabType, label: "ATS Integration", icon: Link2 },
   ];
 
   return (
@@ -180,24 +181,16 @@ export function CandidateImport({ candidates, setCandidates, onNext }: Candidate
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => !tab.comingSoon && setActiveTab(tab.id)}
-            disabled={tab.comingSoon}
+            onClick={() => setActiveTab(tab.id)}
             className={`relative flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
               activeTab === tab.id
                 ? "bg-card text-foreground shadow-sm"
-                : tab.comingSoon
-                ? "text-muted-foreground/50 cursor-not-allowed"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
             <tab.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">{tab.label}</span>
             <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
-            {tab.comingSoon && (
-              <span className="text-[8px] sm:text-[10px] uppercase tracking-wider bg-muted-foreground/20 px-1 sm:px-1.5 py-0.5 rounded">
-                Soon
-              </span>
-            )}
             {tab.highlighted && activeTab === tab.id && (
               <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 sm:w-8 h-0.5 rounded-full tab-indicator" />
             )}
@@ -431,22 +424,10 @@ export function CandidateImport({ candidates, setCandidates, onNext }: Candidate
         )}
 
         {activeTab === "ats" && (
-          <div className="p-6">
-            <div className="text-center py-8">
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-muted mx-auto mb-4">
-                <Link2 className="h-7 w-7 text-muted-foreground" />
-              </div>
-              <h3 className="text-lg font-medium mb-2">
-                Connect your ATS
-              </h3>
-              <p className="text-muted-foreground text-sm mb-4 max-w-md mx-auto">
-                Connect Greenhouse, Lever, Ashby, and other ATS platforms to automatically sync candidates.
-              </p>
-              <span className="inline-flex items-center gap-1.5 text-xs bg-muted px-3 py-1.5 rounded-full text-muted-foreground">
-                Coming soon — CSV works with all ATS
-              </span>
-            </div>
-          </div>
+          <ATSIntegration 
+            candidates={candidates}
+            setCandidates={setCandidates}
+          />
         )}
       </div>
 
