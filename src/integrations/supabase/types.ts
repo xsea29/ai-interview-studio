@@ -14,6 +14,186 @@ export type Database = {
   }
   public: {
     Tables: {
+      feature_change_audit: {
+        Row: {
+          change_type: string
+          changed_by: string | null
+          created_at: string
+          feature_name: string
+          id: string
+          new_value: boolean | null
+          old_value: boolean | null
+          organization_id: string | null
+        }
+        Insert: {
+          change_type?: string
+          changed_by?: string | null
+          created_at?: string
+          feature_name: string
+          id?: string
+          new_value?: boolean | null
+          old_value?: boolean | null
+          organization_id?: string | null
+        }
+        Update: {
+          change_type?: string
+          changed_by?: string | null
+          created_at?: string
+          feature_name?: string
+          id?: string
+          new_value?: boolean | null
+          old_value?: boolean | null
+          organization_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_change_audit_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_billing: {
+        Row: {
+          amount: number
+          auto_renew: boolean | null
+          billing_cycle: string
+          created_at: string
+          id: string
+          next_billing_date: string | null
+          organization_id: string
+          plan: string
+          recipient_email: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          auto_renew?: boolean | null
+          billing_cycle?: string
+          created_at?: string
+          id?: string
+          next_billing_date?: string | null
+          organization_id: string
+          plan: string
+          recipient_email?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          auto_renew?: boolean | null
+          billing_cycle?: string
+          created_at?: string
+          id?: string
+          next_billing_date?: string | null
+          organization_id?: string
+          plan?: string
+          recipient_email?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_billing_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_feature_overrides: {
+        Row: {
+          enabled: boolean
+          feature_name: string
+          id: string
+          organization_id: string
+          overridden_at: string | null
+          overridden_by: string | null
+        }
+        Insert: {
+          enabled: boolean
+          feature_name: string
+          id?: string
+          organization_id: string
+          overridden_at?: string | null
+          overridden_by?: string | null
+        }
+        Update: {
+          enabled?: boolean
+          feature_name?: string
+          id?: string
+          organization_id?: string
+          overridden_at?: string | null
+          overridden_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_feature_overrides_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizations: {
+        Row: {
+          consent_configured: boolean | null
+          created_at: string
+          data_residency: string | null
+          domain: string | null
+          gdpr_compliant: boolean | null
+          id: string
+          industry: string | null
+          name: string
+          owner_email: string | null
+          plan: string
+          retention_days: number | null
+          size: string | null
+          sso_enabled: boolean | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          consent_configured?: boolean | null
+          created_at?: string
+          data_residency?: string | null
+          domain?: string | null
+          gdpr_compliant?: boolean | null
+          id?: string
+          industry?: string | null
+          name: string
+          owner_email?: string | null
+          plan?: string
+          retention_days?: number | null
+          size?: string | null
+          sso_enabled?: boolean | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          consent_configured?: boolean | null
+          created_at?: string
+          data_residency?: string | null
+          domain?: string | null
+          gdpr_compliant?: boolean | null
+          id?: string
+          industry?: string | null
+          name?: string
+          owner_email?: string | null
+          plan?: string
+          retention_days?: number | null
+          size?: string | null
+          sso_enabled?: boolean | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
