@@ -1,153 +1,25 @@
-import { useState } from "react";
-import { Flag, Search, Info } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useMemo } from "react";
+import { Search } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import {
+  initialFeatures,
+  categoryConfig,
+  type FeatureFlag,
+  type FeatureFlagCategory,
+} from "@/lib/featureFlagConfig";
+import { FeatureFlagStats } from "@/components/admin/FeatureFlagStats";
+import { FeatureFlagTable } from "@/components/admin/FeatureFlagTable";
 
-interface FeatureFlag {
-  id: string;
-  name: string;
-  description: string;
-  type: "internal" | "beta" | "general";
-  availability: "global" | "enterprise" | "business";
-  enabled: boolean;
-}
-
-const initialFeatures: FeatureFlag[] = [
-  {
-    id: "video-interviews",
-    name: "Video Interviews",
-    description: "Enable video-based AI interviews with facial analysis",
-    type: "general",
-    availability: "global",
-    enabled: true,
-  },
-  {
-    id: "audio-interviews",
-    name: "Audio Interviews",
-    description: "Enable audio-only AI interviews with speech analysis",
-    type: "general",
-    availability: "global",
-    enabled: true,
-  },
-  {
-    id: "fairness-scoring",
-    name: "Fairness Scoring",
-    description: "AI-powered bias detection and fairness metrics",
-    type: "beta",
-    availability: "enterprise",
-    enabled: true,
-  },
-  {
-    id: "ai-model-v18",
-    name: "AI Model v1.8",
-    description: "Latest AI model with improved accuracy and speed",
-    type: "beta",
-    availability: "enterprise",
-    enabled: false,
-  },
-  {
-    id: "webhooks",
-    name: "Webhooks",
-    description: "Real-time event notifications to external systems",
-    type: "general",
-    availability: "business",
-    enabled: true,
-  },
-  {
-    id: "ats-api-sync",
-    name: "ATS API Sync",
-    description: "Two-way sync with Applicant Tracking Systems",
-    type: "general",
-    availability: "business",
-    enabled: true,
-  },
-  {
-    id: "white-label",
-    name: "Branding White-Label",
-    description: "Full customization of candidate-facing interface",
-    type: "general",
-    availability: "enterprise",
-    enabled: true,
-  },
-  {
-    id: "gdpr-module",
-    name: "GDPR Module",
-    description: "Enhanced EU data protection and consent management",
-    type: "general",
-    availability: "global",
-    enabled: true,
-  },
-  {
-    id: "sso-support",
-    name: "SSO Support",
-    description: "SAML and OAuth single sign-on integration",
-    type: "general",
-    availability: "enterprise",
-    enabled: true,
-  },
-  {
-    id: "advanced-analytics",
-    name: "Advanced Analytics",
-    description: "Deep dive analytics with custom reports",
-    type: "beta",
-    availability: "enterprise",
-    enabled: false,
-  },
-  {
-    id: "multi-language",
-    name: "Multi-Language Support",
-    description: "AI interviews in 12+ languages",
-    type: "internal",
-    availability: "global",
-    enabled: false,
-  },
-  {
-    id: "candidate-mobile-app",
-    name: "Candidate Mobile App",
-    description: "Native mobile app for candidate interviews",
-    type: "internal",
-    availability: "global",
-    enabled: false,
-  },
-];
-
-const typeConfig: Record<string, { label: string; className: string }> = {
-  internal: { label: "Internal", className: "bg-muted text-muted-foreground" },
-  beta: { label: "Beta", className: "bg-warning/15 text-warning" },
-  general: { label: "General", className: "bg-success/15 text-success" },
-};
-
-const availabilityConfig: Record<string, { label: string; className: string }> = {
-  global: { label: "All Plans", className: "bg-primary/15 text-primary" },
-  enterprise: { label: "Enterprise Only", className: "bg-accent text-accent-foreground" },
-  business: { label: "Business+", className: "bg-secondary text-secondary-foreground" },
-};
+const ALL_CATEGORY = "all" as const;
+type CategoryFilter = FeatureFlagCategory | typeof ALL_CATEGORY;
 
 export default function FeatureFlags() {
   const [features, setFeatures] = useState<FeatureFlag[]>(initialFeatures);
   const [search, setSearch] = useState("");
-
-  const filteredFeatures = features.filter(
-    (f) =>
-      f.name.toLowerCase().includes(search.toLowerCase()) ||
-      f.description.toLowerCase().includes(search.toLowerCase())
-  );
+  const [activeCategory, setActiveCategory] = useState<CategoryFilter>(ALL_CATEGORY);
 
   const toggleFeature = (id: string) => {
     setFeatures((prev) =>
@@ -159,9 +31,33 @@ export default function FeatureFlags() {
     }
   };
 
-  const enabledCount = features.filter((f) => f.enabled).length;
-  const betaCount = features.filter((f) => f.type === "beta").length;
-  const internalCount = features.filter((f) => f.type === "internal").length;
+  const filteredFeatures = useMemo(() => {
+    return features.filter((f) => {
+      const matchesSearch =
+        f.name.toLowerCase().includes(search.toLowerCase()) ||
+        f.description.toLowerCase().includes(search.toLowerCase());
+      const matchesCategory =
+        activeCategory === ALL_CATEGORY || f.category === activeCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [features, search, activeCategory]);
+
+  // Count features per category for badges
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: features.length };
+    for (const f of features) {
+      counts[f.category] = (counts[f.category] || 0) + 1;
+    }
+    return counts;
+  }, [features]);
+
+  const categories: { key: CategoryFilter; label: string }[] = [
+    { key: ALL_CATEGORY, label: "All" },
+    ...Object.entries(categoryConfig).map(([key, cfg]) => ({
+      key: key as FeatureFlagCategory,
+      label: cfg.label,
+    })),
+  ];
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -174,51 +70,11 @@ export default function FeatureFlags() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="card-elevated">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Enabled Features</p>
-                <p className="text-2xl font-semibold mt-1 text-success">{enabledCount}</p>
-              </div>
-              <div className="h-10 w-10 rounded-lg bg-success/10 flex items-center justify-center">
-                <Flag className="h-5 w-5 text-success" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="card-elevated">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Beta Features</p>
-                <p className="text-2xl font-semibold mt-1 text-warning">{betaCount}</p>
-              </div>
-              <div className="h-10 w-10 rounded-lg bg-warning/10 flex items-center justify-center">
-                <Flag className="h-5 w-5 text-warning" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="card-elevated">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Internal/Testing</p>
-                <p className="text-2xl font-semibold mt-1">{internalCount}</p>
-              </div>
-              <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
-                <Flag className="h-5 w-5 text-muted-foreground" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <FeatureFlagStats features={features} />
 
-      {/* Search */}
+      {/* Search + Category Filter */}
       <Card className="card-elevated">
-        <CardContent className="pt-6">
+        <CardContent className="pt-6 space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -228,60 +84,43 @@ export default function FeatureFlags() {
               className="pl-9"
             />
           </div>
+
+          {/* Category Tabs */}
+          <div className="flex flex-wrap gap-2">
+            {categories.map((cat) => (
+              <button
+                key={cat.key}
+                onClick={() => setActiveCategory(cat.key)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  activeCategory === cat.key
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                }`}
+              >
+                {cat.label}
+                <Badge
+                  variant="secondary"
+                  className={`ml-0.5 h-4 min-w-4 px-1 text-[10px] ${
+                    activeCategory === cat.key
+                      ? "bg-primary-foreground/20 text-primary-foreground"
+                      : ""
+                  }`}
+                >
+                  {categoryCounts[cat.key] ?? 0}
+                </Badge>
+              </button>
+            ))}
+          </div>
         </CardContent>
       </Card>
 
       {/* Features Table */}
       <Card className="card-elevated">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[300px]">Feature</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead className="w-[120px]">Type</TableHead>
-              <TableHead className="w-[140px]">Availability</TableHead>
-              <TableHead className="w-[100px] text-right">Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredFeatures.map((feature) => (
-              <TableRow key={feature.id}>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{feature.name}</span>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="max-w-xs">{feature.description}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                </TableCell>
-                <TableCell className="text-muted-foreground text-sm">
-                  {feature.description}
-                </TableCell>
-                <TableCell>
-                  <Badge variant="secondary" className={typeConfig[feature.type].className}>
-                    {typeConfig[feature.type].label}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={availabilityConfig[feature.availability].className}>
-                    {availabilityConfig[feature.availability].label}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Switch
-                    checked={feature.enabled}
-                    onCheckedChange={() => toggleFeature(feature.id)}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <FeatureFlagTable
+          features={filteredFeatures}
+          allFeatures={features}
+          onToggle={toggleFeature}
+        />
       </Card>
     </div>
   );
