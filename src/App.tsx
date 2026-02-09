@@ -27,6 +27,7 @@ import NotFound from "./pages/NotFound";
 // Platform Admin
 import AdminLayout from "./components/admin/AdminLayout";
 import Organizations from "./pages/admin/Organizations";
+import CreateOrganization from "./pages/admin/CreateOrganization";
 import OrganizationDetail from "./pages/admin/OrganizationDetail";
 import FeatureFlags from "./pages/admin/FeatureFlags";
 import AIModels from "./pages/admin/AIModels";
@@ -160,6 +161,7 @@ const App = () => (
             >
               <Route index element={<Navigate to="/admin/organizations" replace />} />
               <Route path="organizations" element={<Organizations />} />
+              <Route path="organizations/create" element={<CreateOrganization />} />
               <Route path="organizations/:id" element={<OrganizationDetail />} />
               <Route path="features" element={<FeatureFlags />} />
               <Route path="models" element={<AIModels />} />

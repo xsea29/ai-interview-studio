@@ -53,7 +53,6 @@ import {
   useUpdateOrganization,
   useDeleteOrganization,
 } from "@/hooks/useOrganizations";
-import { CreateOrganizationDialog } from "@/components/admin/CreateOrganizationDialog";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   active: { label: "Active", className: "bg-success/15 text-success border-success/30" },
@@ -74,7 +73,6 @@ export default function Organizations() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [planFilter, setPlanFilter] = useState("all");
   const [selectedOrgs, setSelectedOrgs] = useState<string[]>([]);
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState("");
@@ -149,7 +147,7 @@ export default function Organizations() {
             Manage all tenant organizations on the platform
           </p>
         </div>
-        <Button onClick={() => setIsCreateOpen(true)} className="ai-gradient text-primary-foreground">
+        <Button onClick={() => navigate("/admin/organizations/create")} className="ai-gradient text-primary-foreground">
           <Plus className="h-4 w-4 mr-2" />
           Create Organization
         </Button>
@@ -380,8 +378,8 @@ export default function Organizations() {
         )}
       </Card>
 
-      {/* Create Dialog */}
-      <CreateOrganizationDialog open={isCreateOpen} onOpenChange={setIsCreateOpen} />
+
+      {/* Delete Confirmation */}
 
       {/* Delete Confirmation */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
