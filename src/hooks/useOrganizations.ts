@@ -163,7 +163,7 @@ export function useCreateOrganization() {
           industry: input.industry || null,
           size: input.size || null,
           plan: input.plan,
-          status: "active",
+          status: "pending-activation",
           owner_email: input.ownerEmail || null,
           sso_enabled: input.plan === "enterprise",
           retention_days: input.plan === "starter" ? 90 : input.plan === "professional" ? 180 : 365,

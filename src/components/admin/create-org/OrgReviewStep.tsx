@@ -1,16 +1,38 @@
-import { Check, Lock, Mail, Building2, CreditCard, Users, Settings, Shield, ArrowRight } from "lucide-react";
+import {
+  Check,
+  Lock,
+  Mail,
+  Building2,
+  Users,
+  Shield,
+  ArrowRight,
+  Pencil,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { planConfigs, getDefaultFeaturesForPlan, type PlanType } from "@/lib/planFeatureConfig";
-import { initialFeatures, categoryConfig, type FeatureFlagCategory } from "@/lib/featureFlagConfig";
+import { Button } from "@/components/ui/button";
+import {
+  planConfigs,
+  getDefaultFeaturesForPlan,
+  type PlanType,
+} from "@/lib/planFeatureConfig";
+import {
+  initialFeatures,
+  categoryConfig,
+  type FeatureFlagCategory,
+} from "@/lib/featureFlagConfig";
 import type { OrgFormData } from "./OrgDetailsForm";
 
 interface OrgReviewStepProps {
   formData: OrgFormData;
   plan: PlanType;
   billingCycle: "monthly" | "annual";
+  confirmed: boolean;
+  onConfirmedChange: (v: boolean) => void;
+  onEditDetails: () => void;
 }
 
 const residencyLabels: Record<string, string> = {
@@ -19,15 +41,31 @@ const residencyLabels: Record<string, string> = {
   APAC: "🌏 Asia Pacific",
 };
 
-export function OrgReviewStep({ formData, plan, billingCycle }: OrgReviewStepProps) {
+export function OrgReviewStep({
+  formData,
+  plan,
+  billingCycle,
+  confirmed,
+  onConfirmedChange,
+  onEditDetails,
+}: OrgReviewStepProps) {
   const planConfig = planConfigs[plan];
   const planFeatures = getDefaultFeaturesForPlan(plan);
   const enabledCount = Object.values(planFeatures).filter(Boolean).length;
   const lockedCount = initialFeatures.length - enabledCount;
-  const price = billingCycle === "monthly" ? planConfig.price.monthly : planConfig.price.annual;
+  const price =
+    billingCycle === "monthly"
+      ? planConfig.price.monthly
+      : planConfig.price.annual;
+  const annualSavings =
+    billingCycle === "annual"
+      ? planConfig.price.monthly * 12 - planConfig.price.annual
+      : planConfig.price.monthly * 12 - planConfig.price.annual;
 
   const nextBilling = new Date();
-  nextBilling.setMonth(nextBilling.getMonth() + (billingCycle === "annual" ? 12 : 1));
+  nextBilling.setMonth(
+    nextBilling.getMonth() + (billingCycle === "annual" ? 12 : 1)
+  );
 
   const featuresByCategory = initialFeatures.reduce(
     (acc, f) => {
@@ -40,17 +78,33 @@ export function OrgReviewStep({ formData, plan, billingCycle }: OrgReviewStepPro
 
   // Determine onboarding steps based on enabled features
   const onboardingSteps = [
-    { label: "Account creation", always: true },
-    { label: "Organization setup", always: true },
-    { label: "Billing activation", always: true },
-    { label: "Add team members", always: true },
-    { label: "Domain verification", always: false, requires: "custom-domain" },
-    { label: "Configure integrations", always: false, requires: ["ats-api-sync", "webhooks", "hris-integration"] },
-    { label: "Brand identity", always: false, requires: "white-label" },
-    { label: "Compliance & privacy", always: true },
+    { label: "Account creation", icon: "user", always: true },
+    { label: "Organization setup", icon: "building", always: true },
+    { label: "Billing activation", icon: "card", always: true },
+    { label: "Add team members", icon: "users", always: true },
+    {
+      label: "Domain verification",
+      icon: "globe",
+      always: false,
+      requires: "custom-domain",
+    },
+    {
+      label: "Configure integrations",
+      icon: "plug",
+      always: false,
+      requires: ["ats-api-sync", "webhooks", "hris-integration"],
+    },
+    {
+      label: "Brand identity",
+      icon: "palette",
+      always: false,
+      requires: "white-label",
+    },
+    { label: "Compliance & privacy", icon: "shield", always: true },
   ].filter((step) => {
     if (step.always) return true;
-    if (Array.isArray(step.requires)) return step.requires.some((r) => planFeatures[r]);
+    if (Array.isArray(step.requires))
+      return step.requires.some((r) => planFeatures[r]);
     return planFeatures[step.requires as string];
   });
 
@@ -62,10 +116,27 @@ export function OrgReviewStep({ formData, plan, billingCycle }: OrgReviewStepPro
           <CardContent className="pt-6 space-y-4">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-xl font-bold text-foreground">{formData.name}</h3>
-                <p className="text-sm text-muted-foreground">{formData.domain || "No domain set"}</p>
+                <h3 className="text-xl font-bold text-foreground">
+                  {formData.name}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {formData.domain || "No domain set"}
+                </p>
               </div>
-              <Badge className={planConfig.className}>{planConfig.label}</Badge>
+              <div className="flex items-center gap-2">
+                <Badge className={planConfig.className}>
+                  {planConfig.label}
+                </Badge>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                  onClick={onEditDetails}
+                  title="Edit details"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </Button>
+              </div>
             </div>
 
             <Separator />
@@ -73,7 +144,9 @@ export function OrgReviewStep({ formData, plan, billingCycle }: OrgReviewStepPro
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-muted-foreground">Industry</p>
-                <p className="font-medium capitalize">{formData.industry || "—"}</p>
+                <p className="font-medium capitalize">
+                  {formData.industry || "—"}
+                </p>
               </div>
               <div>
                 <p className="text-muted-foreground">Company Size</p>
@@ -85,7 +158,10 @@ export function OrgReviewStep({ formData, plan, billingCycle }: OrgReviewStepPro
               </div>
               <div>
                 <p className="text-muted-foreground">Data Residency</p>
-                <p className="font-medium">{residencyLabels[formData.dataResidency] || formData.dataResidency}</p>
+                <p className="font-medium">
+                  {residencyLabels[formData.dataResidency] ||
+                    formData.dataResidency}
+                </p>
               </div>
             </div>
 
@@ -99,17 +175,34 @@ export function OrgReviewStep({ formData, plan, billingCycle }: OrgReviewStepPro
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Cost</span>
                 <span className="font-bold">
-                  ${price}/{billingCycle === "monthly" ? "mo" : "yr"}
+                  ${price}
+                  <span className="font-normal text-muted-foreground">
+                    /{billingCycle === "monthly" ? "mo" : "yr"}
+                  </span>
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Next billing</span>
-                <span className="font-medium">{nextBilling.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                <span className="font-medium">
+                  {nextBilling.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Auto-renewal</span>
                 <span className="font-medium text-success">Enabled</span>
               </div>
+              {billingCycle === "monthly" && annualSavings > 0 && (
+                <div className="mt-2 p-2 rounded-lg bg-primary/5 border border-primary/10 text-xs text-muted-foreground">
+                  💡 Switch to annual billing to save{" "}
+                  <span className="font-semibold text-primary">
+                    ${annualSavings}/year
+                  </span>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -135,7 +228,9 @@ export function OrgReviewStep({ formData, plan, billingCycle }: OrgReviewStepPro
               <StepItem
                 icon={<Users className="h-4 w-4" />}
                 title={`Owner Completes Onboarding (${onboardingSteps.length} steps)`}
-                description={onboardingSteps.map((s) => s.label).join(" → ")}
+                description={onboardingSteps
+                  .map((s) => s.label)
+                  .join(" → ")}
               />
               <StepItem
                 icon={<Shield className="h-4 w-4" />}
@@ -145,6 +240,24 @@ export function OrgReviewStep({ formData, plan, billingCycle }: OrgReviewStepPro
             </div>
           </CardContent>
         </Card>
+
+        {/* Confirmation Checkbox */}
+        <div className="flex items-start gap-3 p-4 rounded-lg border border-border bg-muted/30">
+          <Checkbox
+            id="confirm"
+            checked={confirmed}
+            onCheckedChange={(v) => onConfirmedChange(v === true)}
+            className="mt-0.5"
+          />
+          <label
+            htmlFor="confirm"
+            className="text-sm text-foreground cursor-pointer leading-relaxed"
+          >
+            I confirm all information is correct and understand that an
+            onboarding invitation will be sent to{" "}
+            <span className="font-semibold">{formData.ownerEmail}</span>.
+          </label>
+        </div>
       </div>
 
       {/* Right: Features Included */}
@@ -160,61 +273,72 @@ export function OrgReviewStep({ formData, plan, billingCycle }: OrgReviewStepPro
 
         <ScrollArea className="h-[520px]">
           <div className="space-y-5 pr-3">
-            {(Object.entries(featuresByCategory) as [FeatureFlagCategory, typeof initialFeatures][]).map(
-              ([cat, features]) => {
-                const enabledInCat = features.filter((f) => planFeatures[f.id]).length;
-                return (
-                  <div key={cat}>
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                        {categoryConfig[cat].label}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {enabledInCat}/{features.length}
-                      </p>
-                    </div>
-                    <div className="space-y-1">
-                      {features.map((f) => {
-                        const isEnabled = planFeatures[f.id];
-                        return (
-                          <div
-                            key={f.id}
-                            className={`flex items-center justify-between py-2 px-3 rounded-lg text-sm transition-colors ${
-                              isEnabled
-                                ? "bg-success/5"
-                                : "bg-muted/30"
-                            }`}
-                          >
-                            <div className="flex items-center gap-2">
-                              {isEnabled ? (
-                                <Check className="h-3.5 w-3.5 text-success shrink-0" />
-                              ) : (
-                                <Lock className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
-                              )}
-                              <span className={isEnabled ? "text-foreground" : "text-muted-foreground"}>
-                                {f.name}
-                              </span>
-                            </div>
-                            {!isEnabled && (
-                              <span className="text-[10px] text-muted-foreground/60 uppercase">
-                                Upgrade
-                              </span>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
+            {(
+              Object.entries(featuresByCategory) as [
+                FeatureFlagCategory,
+                typeof initialFeatures,
+              ][]
+            ).map(([cat, features]) => {
+              const enabledInCat = features.filter(
+                (f) => planFeatures[f.id]
+              ).length;
+              return (
+                <div key={cat}>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      {categoryConfig[cat].label}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {enabledInCat}/{features.length}
+                    </p>
                   </div>
-                );
-              }
-            )}
+                  <div className="space-y-1">
+                    {features.map((f) => {
+                      const isEnabled = planFeatures[f.id];
+                      return (
+                        <div
+                          key={f.id}
+                          className={`flex items-center justify-between py-2 px-3 rounded-lg text-sm transition-colors ${
+                            isEnabled ? "bg-success/5" : "bg-muted/30"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            {isEnabled ? (
+                              <Check className="h-3.5 w-3.5 text-success shrink-0" />
+                            ) : (
+                              <Lock className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
+                            )}
+                            <span
+                              className={
+                                isEnabled
+                                  ? "text-foreground"
+                                  : "text-muted-foreground"
+                              }
+                            >
+                              {f.name}
+                            </span>
+                          </div>
+                          {!isEnabled && (
+                            <span className="text-[10px] text-muted-foreground/60 uppercase">
+                              Upgrade
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </ScrollArea>
 
         {lockedCount > 0 && plan !== "enterprise" && (
           <div className="p-3 rounded-lg bg-accent/50 border border-accent text-sm">
             <p className="text-accent-foreground">
-              <span className="font-semibold">Upgrade to Enterprise</span> to unlock {lockedCount} additional features including HRIS, White-label, and Custom Domain.
+              <span className="font-semibold">Upgrade to Enterprise</span> to
+              unlock {lockedCount} additional features including HRIS,
+              White-label, and Custom Domain.
             </p>
           </div>
         )}
@@ -223,7 +347,15 @@ export function OrgReviewStep({ formData, plan, billingCycle }: OrgReviewStepPro
   );
 }
 
-function StepItem({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+function StepItem({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
   return (
     <div className="flex gap-3">
       <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 text-primary">
