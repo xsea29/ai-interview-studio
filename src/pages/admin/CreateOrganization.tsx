@@ -7,17 +7,20 @@ import { Progress } from "@/components/ui/progress";
 import { OrgDetailsForm, type OrgFormData } from "@/components/admin/create-org/OrgDetailsForm";
 import { PlanSelector } from "@/components/admin/create-org/PlanSelector";
 import { OrgReviewStep } from "@/components/admin/create-org/OrgReviewStep";
-import { useCreateOrganization, type CreateOrgInput } from "@/hooks/useOrganizations";
+import { OrgSuccessStep } from "@/components/admin/create-org/OrgSuccessStep";
+import { useCreateOrganization, type CreateOrgInput, type Organization } from "@/hooks/useOrganizations";
 import type { PlanType } from "@/lib/planFeatureConfig";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DOMAIN_REGEX = /^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]?(\.[a-zA-Z]{2,})+$/;
 
+type Step = "details" | "review" | "success";
+
 export default function CreateOrganization() {
   const navigate = useNavigate();
   const createOrg = useCreateOrganization();
 
-  const [step, setStep] = useState<"details" | "review">("details");
+  const [step, setStep] = useState<Step>("details");
   const [formData, setFormData] = useState<OrgFormData>({
     name: "",
     domain: "",
@@ -29,6 +32,8 @@ export default function CreateOrganization() {
   const [plan, setPlan] = useState<PlanType>("starter");
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [confirmed, setConfirmed] = useState(false);
+  const [createdOrg, setCreatedOrg] = useState<Organization | null>(null);
 
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
@@ -71,11 +76,30 @@ export default function CreateOrganization() {
       ownerEmail: formData.ownerEmail.trim(),
       billingCycle,
     };
-    await createOrg.mutateAsync(input);
-    navigate("/admin/organizations");
+    const org = await createOrg.mutateAsync(input);
+    setCreatedOrg(org);
+    setStep("success");
   };
 
   const progressValue = step === "details" ? 50 : 100;
+  const stepLabel =
+    step === "details"
+      ? "Set up a new organization with plan features. Owner will complete setup during onboarding."
+      : step === "review"
+        ? "Verify all details before creating the organization."
+        : "";
+
+  if (step === "success" && createdOrg) {
+    return (
+      <div className="space-y-6 animate-fade-in">
+        <OrgSuccessStep
+          organization={createdOrg}
+          onViewOrganization={() => navigate(`/admin/organizations/${createdOrg.id}`)}
+          onBackToList={() => navigate("/admin/organizations")}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -93,11 +117,7 @@ export default function CreateOrganization() {
 
         <div>
           <h1 className="text-2xl font-bold text-foreground">Create New Organization</h1>
-          <p className="text-muted-foreground mt-1">
-            {step === "details"
-              ? "Set up a new organization with plan features. Owner will complete setup during onboarding."
-              : "Verify all details before creating the organization."}
-          </p>
+          <p className="text-muted-foreground mt-1">{stepLabel}</p>
         </div>
 
         {/* Progress */}
@@ -134,7 +154,14 @@ export default function CreateOrganization() {
           </Card>
         </div>
       ) : (
-        <OrgReviewStep formData={formData} plan={plan} billingCycle={billingCycle} />
+        <OrgReviewStep
+          formData={formData}
+          plan={plan}
+          billingCycle={billingCycle}
+          confirmed={confirmed}
+          onConfirmedChange={setConfirmed}
+          onEditDetails={() => setStep("details")}
+        />
       )}
 
       {/* Footer Actions */}
@@ -177,7 +204,7 @@ export default function CreateOrganization() {
           ) : (
             <Button
               onClick={handleCreate}
-              disabled={createOrg.isPending}
+              disabled={createOrg.isPending || !confirmed}
               className="ai-gradient text-primary-foreground"
             >
               {createOrg.isPending ? "Creating..." : "Create Organization"}
