@@ -179,7 +179,7 @@ const InviteJoinPage = () => {
             />
           )}
           {state === "verify-email" && inviteData && (
-            <VerifyEmailState email={inviteData.email} />
+            <VerifyEmailState email={inviteData.email} onVerified={acceptInvite} />
           )}
           {state === "accepting" && <AcceptingState />}
         </motion.div>
@@ -371,26 +371,137 @@ function SignupState({
   );
 }
 
-function VerifyEmailState({ email }: { email: string }) {
+function VerifyEmailState({
+  email,
+  onVerified,
+}: {
+  email: string;
+  onVerified: () => void;
+}) {
+  const [otp, setOtp] = useState("");
+  const [verifying, setVerifying] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (otp.length < 6) return;
+    setVerifying(true);
+    setError("");
+
+    try {
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        email,
+        token: otp,
+        type: "signup",
+      });
+
+      if (verifyError) {
+        setError(verifyError.message);
+        setVerifying(false);
+        return;
+      }
+
+      toast.success("Email verified!");
+      onVerified();
+    } catch {
+      setError("Verification failed. Please try again.");
+      setVerifying(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setResending(true);
+    setError("");
+
+    try {
+      const { error: resendError } = await supabase.auth.resend({
+        type: "signup",
+        email,
+      });
+
+      if (resendError) {
+        toast.error(resendError.message);
+      } else {
+        toast.success("Verification code resent!");
+      }
+    } catch {
+      toast.error("Failed to resend code.");
+    } finally {
+      setResending(false);
+    }
+  };
+
   return (
     <Card className="card-elevated">
-      <CardContent className="pt-8 pb-8 flex flex-col items-center gap-5 text-center">
-        <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
-          <Mail className="h-7 w-7 text-primary" />
+      <CardContent className="pt-8 pb-6 space-y-6">
+        <div className="flex flex-col items-center text-center gap-3">
+          <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
+            <Mail className="h-7 w-7 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-foreground">Verify Your Email</h2>
+            <p className="text-sm text-muted-foreground mt-2">
+              We've sent a 6-digit code to{" "}
+              <span className="font-medium text-foreground">{email}</span>
+            </p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-xl font-bold text-foreground">Check Your Email</h2>
-          <p className="text-sm text-muted-foreground mt-2">
-            We've sent a verification link to{" "}
-            <span className="font-medium text-foreground">{email}</span>
-          </p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Click the link in the email to verify your account and continue.
-          </p>
+
+        <form onSubmit={handleVerify} className="space-y-4">
+          <div>
+            <Label htmlFor="otp-code">Verification Code</Label>
+            <Input
+              id="otp-code"
+              type="text"
+              inputMode="numeric"
+              maxLength={6}
+              value={otp}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, "").slice(0, 6);
+                setOtp(val);
+              }}
+              placeholder="000000"
+              className="mt-1.5 text-center text-2xl tracking-[0.5em] font-mono"
+              autoFocus
+            />
+          </div>
+
+          {error && (
+            <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 rounded-lg p-3">
+              <AlertTriangle className="h-4 w-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            disabled={verifying || otp.length < 6}
+            className="w-full ai-gradient text-primary-foreground"
+            size="lg"
+          >
+            {verifying ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+            Verify Email
+          </Button>
+        </form>
+
+        <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
+          <span>Didn't receive it?</span>
+          <Button
+            type="button"
+            variant="link"
+            size="sm"
+            onClick={handleResend}
+            disabled={resending}
+            className="px-1 h-auto"
+          >
+            {resending ? "Sending..." : "Resend code"}
+          </Button>
         </div>
+
         <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted rounded-lg p-3">
           <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
-          <span>You'll be redirected automatically after verification.</span>
+          <span>Enter the code from your email to continue.</span>
         </div>
       </CardContent>
     </Card>
