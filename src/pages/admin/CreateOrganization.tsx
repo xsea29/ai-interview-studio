@@ -33,7 +33,7 @@ export default function CreateOrganization() {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [confirmed, setConfirmed] = useState(false);
-  const [createdOrg, setCreatedOrg] = useState<Organization | null>(null);
+  const [createdOrg, setCreatedOrg] = useState<(Organization & { inviteToken?: string | null }) | null>(null);
 
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
