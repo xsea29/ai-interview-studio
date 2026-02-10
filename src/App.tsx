@@ -22,6 +22,7 @@ import Integrations from "./pages/Integrations";
 import Settings from "./pages/Settings";
 import AIAnalytics from "./pages/AIAnalytics";
 import CompanyOnboarding from "./pages/CompanyOnboarding";
+import InviteJoinPage from "./pages/InviteJoinPage";
 import NotFound from "./pages/NotFound";
 
 // Platform Admin
@@ -57,6 +58,16 @@ const App = () => (
               element={
                 <RequireAuth>
                   <Index />
+                </RequireAuth>
+              }
+            />
+            {/* Public invite join route */}
+            <Route path="/onboarding/join/:token" element={<InviteJoinPage />} />
+            <Route
+              path="/onboarding/:orgId"
+              element={
+                <RequireAuth>
+                  <CompanyOnboarding />
                 </RequireAuth>
               }
             />

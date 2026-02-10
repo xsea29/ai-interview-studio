@@ -18,7 +18,7 @@ import type { Organization } from "@/hooks/useOrganizations";
 import { planConfigs, type PlanType } from "@/lib/planFeatureConfig";
 
 interface OrgSuccessStepProps {
-  organization: Organization;
+  organization: Organization & { inviteToken?: string | null };
   onViewOrganization: () => void;
   onBackToList: () => void;
 }
@@ -29,6 +29,9 @@ export function OrgSuccessStep({
   onBackToList,
 }: OrgSuccessStepProps) {
   const planConfig = planConfigs[(organization.plan as PlanType) || "starter"];
+  const inviteLink = organization.inviteToken
+    ? `${window.location.origin}/onboarding/join/${organization.inviteToken}`
+    : null;
 
   const mockKeys = {
     production: `sk_prod_${organization.id.replace(/-/g, "").slice(0, 32)}`,
@@ -122,6 +125,32 @@ export function OrgSuccessStep({
           </div>
         </CardContent>
       </Card>
+
+      {/* Invite Link Fallback */}
+      {inviteLink && (
+        <Card className="card-elevated border-accent/30 bg-accent/[0.03]">
+          <CardContent className="pt-6 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <ExternalLink className="h-4 w-4 text-primary" />
+              Onboarding Invite Link
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Share this link directly if the email doesn't arrive. Expires in 72 hours.
+            </p>
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 border border-border">
+              <p className="text-sm font-mono truncate flex-1">{inviteLink}</p>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0"
+                onClick={() => copyToClipboard(inviteLink, "Invite link")}
+              >
+                <Copy className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* API Keys */}
       <Card className="card-elevated">

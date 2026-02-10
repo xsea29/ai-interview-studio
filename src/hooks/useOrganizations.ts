@@ -210,7 +210,44 @@ export function useCreateOrganization() {
         if (featureError) throw featureError;
       }
 
-      return org as Organization;
+      // 4. Generate invite token and create onboarding_invites record
+      let inviteToken: string | null = null;
+      if (input.ownerEmail) {
+        inviteToken = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "").slice(0, 8);
+        
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        const { error: inviteError } = await supabase
+          .from("onboarding_invites")
+          .insert({
+            organization_id: org.id,
+            email: input.ownerEmail,
+            token: inviteToken,
+            status: "pending",
+            created_by: user?.id || null,
+          });
+
+        if (inviteError) {
+          console.error("Failed to create invite:", inviteError);
+          inviteToken = null;
+        } else {
+          // 5. Try to send invite email (non-blocking)
+          supabase.functions
+            .invoke("send-invite-email", {
+              body: {
+                email: input.ownerEmail,
+                organizationName: input.name,
+                token: inviteToken,
+                baseUrl: window.location.origin,
+              },
+            })
+            .then(({ error }) => {
+              if (error) console.warn("Email send failed (non-critical):", error);
+            });
+        }
+      }
+
+      return { ...org, inviteToken } as Organization & { inviteToken: string | null };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["organizations"] });
