@@ -1,23 +1,16 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Building2,
-  Loader2,
-  AlertTriangle,
-  CheckCircle2,
-  Mail,
-  ArrowRight,
-  Shield,
-  Sparkles,
-} from "lucide-react";
 import { toast } from "sonner";
+import { InviteBrandingPanel } from "@/components/invite/InviteBrandingPanel";
+import { InvitePreviewCard } from "@/components/invite/InvitePreviewCard";
+import { InviteSignupForm } from "@/components/invite/InviteSignupForm";
+import { InviteEmailVerification } from "@/components/invite/InviteEmailVerification";
+import {
+  InviteLoadingScreen,
+  InviteInvalidScreen,
+  InviteAcceptingScreen,
+} from "@/components/invite/InviteStatusScreens";
 
 type PageState = "loading" | "invalid" | "preview" | "signup" | "verify-email" | "accepting";
 
@@ -70,7 +63,6 @@ const InviteJoinPage = () => {
     }
   }, [token]);
 
-  // Handle post-verification redirect
   const acceptInvite = useCallback(async () => {
     if (!token) return;
     setState("accepting");
@@ -97,14 +89,12 @@ const InviteJoinPage = () => {
   useEffect(() => {
     const verified = searchParams.get("verified");
     if (verified === "true") {
-      // User just verified email, try to accept invite
       acceptInvite();
       return;
     }
     validateToken();
   }, [validateToken, searchParams, acceptInvite]);
 
-  // Listen for auth state changes (email verification)
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_IN" && state === "verify-email") {
@@ -147,376 +137,45 @@ const InviteJoinPage = () => {
 
   const enabledFeatureCount = inviteData?.features.filter((f) => f.enabled).length ?? 0;
 
+  // Full-screen states (no split panel)
+  if (state === "loading") return <InviteLoadingScreen />;
+  if (state === "invalid") return <InviteInvalidScreen message={errorMessage} />;
+  if (state === "accepting") return <InviteAcceptingScreen />;
+
+  // Split-panel layout for preview, signup, and verification
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={state}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
-          className="w-full max-w-lg"
-        >
-          {state === "loading" && <LoadingState />}
-          {state === "invalid" && <InvalidState message={errorMessage} />}
-          {state === "preview" && inviteData && (
-            <PreviewState
-              data={inviteData}
-              featureCount={enabledFeatureCount}
-              onGetStarted={() => setState("signup")}
-            />
-          )}
-          {state === "signup" && inviteData && (
-            <SignupState
-              email={inviteData.email}
-              orgName={inviteData.organization.name}
-              formData={formData}
-              setFormData={setFormData}
-              onSubmit={handleSignup}
-              submitting={submitting}
-              onBack={() => setState("preview")}
-            />
-          )}
-          {state === "verify-email" && inviteData && (
-            <VerifyEmailState email={inviteData.email} onVerified={acceptInvite} />
-          )}
-          {state === "accepting" && <AcceptingState />}
-        </motion.div>
-      </AnimatePresence>
+    <div className="min-h-screen flex">
+      <InviteBrandingPanel
+        orgName={inviteData?.organization.name}
+        plan={inviteData?.organization.plan}
+        industry={inviteData?.organization.industry}
+      />
+
+      <div className="flex-1 flex items-center justify-center p-8 bg-background">
+        {state === "preview" && inviteData && (
+          <InvitePreviewCard
+            data={inviteData}
+            featureCount={enabledFeatureCount}
+            onGetStarted={() => setState("signup")}
+          />
+        )}
+        {state === "signup" && inviteData && (
+          <InviteSignupForm
+            email={inviteData.email}
+            orgName={inviteData.organization.name}
+            formData={formData}
+            setFormData={setFormData}
+            onSubmit={handleSignup}
+            submitting={submitting}
+            onBack={() => setState("preview")}
+          />
+        )}
+        {state === "verify-email" && inviteData && (
+          <InviteEmailVerification email={inviteData.email} onVerified={acceptInvite} />
+        )}
+      </div>
     </div>
   );
 };
-
-function LoadingState() {
-  return (
-    <Card className="card-elevated">
-      <CardContent className="pt-8 pb-8 flex flex-col items-center gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-muted-foreground">Validating your invite...</p>
-      </CardContent>
-    </Card>
-  );
-}
-
-function InvalidState({ message }: { message: string }) {
-  return (
-    <Card className="card-elevated border-destructive/30">
-      <CardContent className="pt-8 pb-8 flex flex-col items-center gap-4 text-center">
-        <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
-          <AlertTriangle className="h-6 w-6 text-destructive" />
-        </div>
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">Invalid Invite</h2>
-          <p className="text-sm text-muted-foreground mt-1">{message}</p>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Contact your administrator if you believe this is an error.
-        </p>
-      </CardContent>
-    </Card>
-  );
-}
-
-function PreviewState({
-  data,
-  featureCount,
-  onGetStarted,
-}: {
-  data: InviteData;
-  featureCount: number;
-  onGetStarted: () => void;
-}) {
-  return (
-    <Card className="card-elevated">
-      <CardContent className="pt-8 pb-6 space-y-6">
-        <div className="flex flex-col items-center text-center gap-3">
-          <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-            <Building2 className="h-7 w-7 text-primary" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-foreground">
-              Join {data.organization.name}
-            </h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              You've been invited to set up this organization
-            </p>
-          </div>
-        </div>
-
-        <div className="space-y-3 bg-muted/50 rounded-xl p-4">
-          <InfoRow label="Plan">
-            <Badge variant="secondary" className="capitalize">
-              {data.organization.plan}
-            </Badge>
-          </InfoRow>
-          {data.organization.industry && (
-            <InfoRow label="Industry">{data.organization.industry}</InfoRow>
-          )}
-          {data.organization.size && (
-            <InfoRow label="Size">{data.organization.size}</InfoRow>
-          )}
-          <InfoRow label="Features">
-            <span className="flex items-center gap-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
-              {featureCount} enabled
-            </span>
-          </InfoRow>
-        </div>
-
-        <div className="flex items-center gap-2 text-xs text-muted-foreground bg-accent/50 rounded-lg p-3">
-          <Shield className="h-4 w-4 text-accent-foreground shrink-0" />
-          <span>Your data is encrypted and stored securely. You'll set up your account in the next step.</span>
-        </div>
-
-        <Button onClick={onGetStarted} className="w-full ai-gradient text-primary-foreground" size="lg">
-          Get Started
-          <ArrowRight className="h-4 w-4 ml-2" />
-        </Button>
-      </CardContent>
-    </Card>
-  );
-}
-
-function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-center justify-between text-sm">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium text-foreground">{children}</span>
-    </div>
-  );
-}
-
-function SignupState({
-  email,
-  orgName,
-  formData,
-  setFormData,
-  onSubmit,
-  submitting,
-  onBack,
-}: {
-  email: string;
-  orgName: string;
-  formData: { firstName: string; lastName: string; password: string };
-  setFormData: (d: typeof formData) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  submitting: boolean;
-  onBack: () => void;
-}) {
-  return (
-    <Card className="card-elevated">
-      <CardContent className="pt-8 pb-6 space-y-6">
-        <div className="text-center">
-          <h2 className="text-xl font-bold text-foreground">Create Your Account</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Set up your account for {orgName}
-          </p>
-        </div>
-
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" value={email} disabled className="mt-1.5 bg-muted" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label htmlFor="firstName">First Name</Label>
-              <Input
-                id="firstName"
-                value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                required
-                className="mt-1.5"
-                placeholder="Jane"
-              />
-            </div>
-            <div>
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input
-                id="lastName"
-                value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                required
-                className="mt-1.5"
-                placeholder="Smith"
-              />
-            </div>
-          </div>
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              required
-              minLength={8}
-              className="mt-1.5"
-              placeholder="Min 8 characters"
-            />
-          </div>
-
-          <Button type="submit" disabled={submitting} className="w-full ai-gradient text-primary-foreground" size="lg">
-            {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-            Create Account
-          </Button>
-
-          <Button type="button" variant="ghost" onClick={onBack} className="w-full text-sm">
-            Back
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
-  );
-}
-
-function VerifyEmailState({
-  email,
-  onVerified,
-}: {
-  email: string;
-  onVerified: () => void;
-}) {
-  const [otp, setOtp] = useState("");
-  const [verifying, setVerifying] = useState(false);
-  const [resending, setResending] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (otp.length < 6) return;
-    setVerifying(true);
-    setError("");
-
-    try {
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        email,
-        token: otp,
-        type: "signup",
-      });
-
-      if (verifyError) {
-        setError(verifyError.message);
-        setVerifying(false);
-        return;
-      }
-
-      toast.success("Email verified!");
-      onVerified();
-    } catch {
-      setError("Verification failed. Please try again.");
-      setVerifying(false);
-    }
-  };
-
-  const handleResend = async () => {
-    setResending(true);
-    setError("");
-
-    try {
-      const { error: resendError } = await supabase.auth.resend({
-        type: "signup",
-        email,
-      });
-
-      if (resendError) {
-        toast.error(resendError.message);
-      } else {
-        toast.success("Verification code resent!");
-      }
-    } catch {
-      toast.error("Failed to resend code.");
-    } finally {
-      setResending(false);
-    }
-  };
-
-  return (
-    <Card className="card-elevated">
-      <CardContent className="pt-8 pb-6 space-y-6">
-        <div className="flex flex-col items-center text-center gap-3">
-          <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
-            <Mail className="h-7 w-7 text-primary" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-foreground">Verify Your Email</h2>
-            <p className="text-sm text-muted-foreground mt-2">
-              We've sent a 6-digit code to{" "}
-              <span className="font-medium text-foreground">{email}</span>
-            </p>
-          </div>
-        </div>
-
-        <form onSubmit={handleVerify} className="space-y-4">
-          <div>
-            <Label htmlFor="otp-code">Verification Code</Label>
-            <Input
-              id="otp-code"
-              type="text"
-              inputMode="numeric"
-              maxLength={6}
-              value={otp}
-              onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, "").slice(0, 6);
-                setOtp(val);
-              }}
-              placeholder="000000"
-              className="mt-1.5 text-center text-2xl tracking-[0.5em] font-mono"
-              autoFocus
-            />
-          </div>
-
-          {error && (
-            <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 rounded-lg p-3">
-              <AlertTriangle className="h-4 w-4 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          <Button
-            type="submit"
-            disabled={verifying || otp.length < 6}
-            className="w-full ai-gradient text-primary-foreground"
-            size="lg"
-          >
-            {verifying ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-            Verify Email
-          </Button>
-        </form>
-
-        <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
-          <span>Didn't receive it?</span>
-          <Button
-            type="button"
-            variant="link"
-            size="sm"
-            onClick={handleResend}
-            disabled={resending}
-            className="px-1 h-auto"
-          >
-            {resending ? "Sending..." : "Resend code"}
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted rounded-lg p-3">
-          <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
-          <span>Enter the code from your email to continue.</span>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function AcceptingState() {
-  return (
-    <Card className="card-elevated">
-      <CardContent className="pt-8 pb-8 flex flex-col items-center gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-muted-foreground">Setting up your organization...</p>
-      </CardContent>
-    </Card>
-  );
-}
 
 export default InviteJoinPage;
