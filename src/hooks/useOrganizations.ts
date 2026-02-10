@@ -298,6 +298,24 @@ export function useDeleteOrganization() {
   });
 }
 
+export function useResendInvite() {
+  return useMutation({
+    mutationFn: async (organizationId: string) => {
+      const { data, error } = await supabase.functions.invoke("resend-invite", {
+        body: { organizationId },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.emailSent ? "Invite resent successfully" : "New invite link generated (email not configured)");
+    },
+    onError: (error) => {
+      toast.error(`Failed to resend invite: ${error.message}`);
+    },
+  });
+}
+
 export function useToggleFeatureOverride() {
   const queryClient = useQueryClient();
 
