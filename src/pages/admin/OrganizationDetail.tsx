@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   Building2,
   Download,
+  Mail,
   Pause,
   Play,
   Trash2,
@@ -17,6 +18,7 @@ import {
   useOrgBilling,
   useUpdateOrganization,
   useDeleteOrganization,
+  useResendInvite,
 } from "@/hooks/useOrganizations";
 import { planConfigs, type PlanType } from "@/lib/planFeatureConfig";
 import { OrgDetailOverview } from "@/components/admin/OrgDetailOverview";
@@ -32,6 +34,7 @@ export default function OrganizationDetail() {
   const { data: billing } = useOrgBilling(id);
   const updateOrg = useUpdateOrganization();
   const deleteOrg = useDeleteOrganization();
+  const resendInvite = useResendInvite();
   const [activeTab, setActiveTab] = useState("overview");
 
   if (isLoading) {
@@ -129,6 +132,12 @@ export default function OrganizationDetail() {
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
+          {org.status === "pending-activation" && (
+            <Button variant="outline" size="sm" onClick={() => resendInvite.mutateAsync(org.id)} disabled={resendInvite.isPending}>
+              <Mail className="h-4 w-4 mr-2" />
+              {resendInvite.isPending ? "Sending..." : "Resend Invite"}
+            </Button>
+          )}
           {org.status === "suspended" ? (
             <Button variant="outline" size="sm" onClick={handleResume}>
               <Play className="h-4 w-4 mr-2" />
