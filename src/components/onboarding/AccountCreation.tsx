@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { OnboardingData } from "@/pages/CompanyOnboarding";
+import { HelpTooltip } from "./HelpTooltip";
 
 interface AccountCreationProps {
   data: OnboardingData;
@@ -103,7 +104,10 @@ const AccountCreation = ({ data, updateData, onNext }: AccountCreationProps) => 
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name *</Label>
+              <Label htmlFor="name" className="flex items-center gap-1.5">
+                Full Name *
+                <HelpTooltip content="Enter your full legal name as it appears on official documents. This will be used for your admin account." />
+              </Label>
               <Input
                 id="name"
                 placeholder="John Smith"
@@ -115,7 +119,10 @@ const AccountCreation = ({ data, updateData, onNext }: AccountCreationProps) => 
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="email">Work Email *</Label>
+              <Label htmlFor="email" className="flex items-center gap-1.5">
+                Work Email *
+                <HelpTooltip content="Use your corporate email address. We'll verify your domain ownership through this email. Personal emails (gmail, yahoo) are not recommended." />
+              </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -156,7 +163,10 @@ const AccountCreation = ({ data, updateData, onNext }: AccountCreationProps) => 
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="companyName">Company Name *</Label>
+            <Label htmlFor="companyName" className="flex items-center gap-1.5">
+              Company Name *
+              <HelpTooltip content="Your organization's official name. This will be displayed to candidates during interviews." />
+            </Label>
             <Input
               id="companyName"
               placeholder="Acme Corporation"
@@ -169,7 +179,10 @@ const AccountCreation = ({ data, updateData, onNext }: AccountCreationProps) => 
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="country">Country *</Label>
+              <Label htmlFor="country" className="flex items-center gap-1.5">
+                Country *
+                <HelpTooltip content="Your primary business location. This determines default data residency and compliance settings." />
+              </Label>
               <Select
                 value={data.account.country}
                 onValueChange={(value) => updateData("account", { country: value })}
@@ -188,7 +201,10 @@ const AccountCreation = ({ data, updateData, onNext }: AccountCreationProps) => 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="industry">Industry *</Label>
+              <Label htmlFor="industry" className="flex items-center gap-1.5">
+                Industry *
+                <HelpTooltip content="Helps us tailor AI interview templates and compliance requirements for your sector." />
+              </Label>
               <Select
                 value={data.account.industry}
                 onValueChange={(value) => updateData("account", { industry: value })}

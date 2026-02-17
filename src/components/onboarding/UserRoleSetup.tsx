@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { OnboardingData } from "@/pages/CompanyOnboarding";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { HelpTooltip } from "./HelpTooltip";
 
 interface UserRoleSetupProps {
   data: OnboardingData;
@@ -433,6 +434,7 @@ const UserRoleSetup = ({ data, updateData, onNext, onBack, step }: UserRoleSetup
               <Label htmlFor="mfa" className="flex items-center gap-2">
                 <Key className="w-4 h-4 text-primary" />
                 Require MFA for All Users
+                <HelpTooltip content="Multi-factor authentication adds a second verification step (like a phone code) when logging in.&#10;&#10;Strongly recommended for organizations handling sensitive candidate data or in regulated industries." />
               </Label>
               <p className="text-sm text-muted-foreground mt-1">
                 Force multi-factor authentication for enhanced security

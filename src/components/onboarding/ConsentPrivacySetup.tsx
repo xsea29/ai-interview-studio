@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OnboardingData } from "@/pages/CompanyOnboarding";
 import { cn } from "@/lib/utils";
+import { HelpTooltip } from "./HelpTooltip";
 
 interface ConsentPrivacySetupProps {
   data: OnboardingData;
@@ -38,10 +39,10 @@ const ConsentPrivacySetup = ({ data, updateData, onNext, onBack, step }: Consent
 
         <Card className="card-elevated">
           <CardHeader>
-            <CardTitle className="text-lg">Candidate Consent Options</CardTitle>
-            <CardDescription>
-              Toggle what consent screens candidates will see
-            </CardDescription>
+            <CardTitle className="text-lg flex items-center gap-2">
+              Candidate Consent Options
+              <HelpTooltip content="Configure what disclosures and consent screens candidates see before starting an interview. Required items cannot be disabled for legal compliance." />
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {[
@@ -246,7 +247,10 @@ const ConsentPrivacySetup = ({ data, updateData, onNext, onBack, step }: Consent
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label>Retention Period</Label>
+            <Label className="flex items-center gap-1.5">
+              Retention Period
+              <HelpTooltip content="How long interview recordings and evaluation data are kept.&#10;&#10;30 days: Minimal storage, strict compliance.&#10;90 days: Recommended for most organizations.&#10;365 days: For long hiring cycles or audit requirements." />
+            </Label>
             <Select
               value={String(data.consent.retentionDays)}
               onValueChange={(value) =>

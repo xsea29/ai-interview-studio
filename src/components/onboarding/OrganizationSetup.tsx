@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { OnboardingData } from "@/pages/CompanyOnboarding";
 import { cn } from "@/lib/utils";
+import { HelpTooltip } from "./HelpTooltip";
 
 interface OrganizationSetupProps {
   data: OnboardingData;
@@ -92,7 +93,10 @@ const OrganizationSetup = ({ data, updateData, onNext, onBack, step }: Organizat
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="legalName">Legal Company Name *</Label>
+                <Label htmlFor="legalName" className="flex items-center gap-1.5">
+                  Legal Company Name *
+                  <HelpTooltip content="The registered legal name of your company. Used for contracts, billing, and compliance documentation." />
+                </Label>
                 <Input
                   id="legalName"
                   placeholder="Acme Corporation Inc."
@@ -104,7 +108,10 @@ const OrganizationSetup = ({ data, updateData, onNext, onBack, step }: Organizat
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="displayName">Display Name *</Label>
+                <Label htmlFor="displayName" className="flex items-center gap-1.5">
+                  Display Name *
+                  <HelpTooltip content="A shorter, brand-friendly name shown in the platform UI and to your team members." />
+                </Label>
                 <Input
                   id="displayName"
                   placeholder="Acme Corp"
@@ -117,7 +124,10 @@ const OrganizationSetup = ({ data, updateData, onNext, onBack, step }: Organizat
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="companySize">Company Size *</Label>
+              <Label htmlFor="companySize" className="flex items-center gap-1.5">
+                Company Size *
+                <HelpTooltip content="Total employee count. This helps us recommend appropriate plan limits and interview volumes." />
+              </Label>
               <Select
                 value={data.organization.companySize}
                 onValueChange={(value) => updateData("organization", { companySize: value })}
@@ -233,6 +243,7 @@ const OrganizationSetup = ({ data, updateData, onNext, onBack, step }: Organizat
             <CardTitle className="text-lg flex items-center gap-2">
               <Lock className="w-5 h-5 text-primary" />
               Password Policy
+              <HelpTooltip content="Basic: Min 8 chars with 1 number.&#10;Strong: 12+ chars with uppercase, numbers, symbols.&#10;Enterprise: 16+ chars with all requirements + rotation.&#10;&#10;Recommended: Strong for most organizations." />
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -272,6 +283,7 @@ const OrganizationSetup = ({ data, updateData, onNext, onBack, step }: Organizat
             <CardTitle className="text-lg flex items-center gap-2">
               <Key className="w-5 h-5 text-primary" />
               Login Method
+              <HelpTooltip content="Email & Password: Standard login, easy to set up.&#10;SSO (SAML): Centralized login via your identity provider (e.g., Okta, Azure AD). Requires IT setup.&#10;OAuth: Sign in with Google, Microsoft, etc. Quick setup, good for small teams." />
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -315,7 +327,10 @@ const OrganizationSetup = ({ data, updateData, onNext, onBack, step }: Organizat
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="timeout">Session Timeout (minutes)</Label>
+              <Label htmlFor="timeout" className="flex items-center gap-1.5">
+                Session Timeout (minutes)
+                <HelpTooltip content="How long a user can stay idle before being logged out.&#10;&#10;15–30 min: High security (finance, healthcare)&#10;60 min: Balanced (most teams)&#10;2–8 hours: Convenience-focused" />
+              </Label>
               <Select
                 value={String(data.organization.sessionTimeout)}
                 onValueChange={(value) => updateData("organization", { sessionTimeout: Number(value) })}

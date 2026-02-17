@@ -11,6 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { OnboardingData } from "@/pages/CompanyOnboarding";
 import { cn } from "@/lib/utils";
+import { HelpTooltip } from "./HelpTooltip";
 
 interface BillingActivationProps {
   data: OnboardingData;
@@ -272,7 +273,10 @@ const BillingActivation = ({ data, updateData, onNext, onBack, step }: BillingAc
             <CardContent className="pt-6 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <Label>Auto-Recharge</Label>
+                  <Label className="flex items-center gap-1.5">
+                    Auto-Recharge
+                    <HelpTooltip content="When enabled, we'll automatically purchase additional credits when your balance drops below 5. This prevents interview interruptions due to insufficient credits." />
+                  </Label>
                   <p className="text-sm text-muted-foreground">
                     Automatically buy more credits when running low
                   </p>

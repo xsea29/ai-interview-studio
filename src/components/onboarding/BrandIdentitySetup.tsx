@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { OnboardingData } from "@/pages/CompanyOnboarding";
 import { cn } from "@/lib/utils";
+import { HelpTooltip } from "./HelpTooltip";
 
 interface BrandIdentitySetupProps {
   data: OnboardingData;
@@ -219,7 +220,10 @@ const BrandIdentitySetup = ({ data, updateData, onNext, onBack, step }: BrandIde
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="candidateCompanyName">Company Name (shown to candidates)</Label>
+                  <Label htmlFor="candidateCompanyName" className="flex items-center gap-1.5">
+                    Company Name (shown to candidates)
+                    <HelpTooltip content="This is the name candidates will see during their interview experience. Can differ from your legal name (e.g., use a brand name or DBA)." />
+                  </Label>
                   <Input
                     id="candidateCompanyName"
                     placeholder={data.organization.displayName || "Your Company"}
