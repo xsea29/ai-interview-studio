@@ -13,6 +13,7 @@ import IntegrationSetup from "@/components/onboarding/IntegrationSetup";
 import ConsentPrivacySetup from "@/components/onboarding/ConsentPrivacySetup";
 import BillingActivation from "@/components/onboarding/BillingActivation";
 import OnboardingComplete from "@/components/onboarding/OnboardingComplete";
+import { OnboardingSupportButton } from "@/components/onboarding/OnboardingSupportButton";
 
 export interface OnboardingData {
   // Phase 1: Account Creation
@@ -289,6 +290,8 @@ const CompanyOnboarding = () => {
           {renderPhaseContent()}
         </motion.div>
       </AnimatePresence>
+
+      {currentPhase <= 7 && <OnboardingSupportButton />}
     </div>
   );
 };
