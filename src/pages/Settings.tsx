@@ -1,297 +1,150 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Building2, Palette, Clock, Key, Save, Upload } from "lucide-react";
+import { Building2, Shield, Users, Palette, Video, CreditCard, Database, Bell, Key, Link2, Search } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "sonner";
-import { DataOwnershipSettings } from "@/components/settings/DataOwnershipSettings";
-import { RoleSettings } from "@/components/settings/RoleSettings";
+import { cn } from "@/lib/utils";
+import { OrganizationSettings } from "@/components/settings/OrganizationSettings";
+import { SecuritySettings } from "@/components/settings/SecuritySettings";
+import { TeamSettings } from "@/components/settings/TeamSettings";
+import { BrandingSettings } from "@/components/settings/BrandingSettings";
+import { InterviewSettings } from "@/components/settings/InterviewSettings";
 import { ATSSettings } from "@/components/settings/ATSSettings";
+import { PrivacySettings } from "@/components/settings/PrivacySettings";
+import { BillingSettings } from "@/components/settings/BillingSettings";
+import { NotificationSettings } from "@/components/settings/NotificationSettings";
+import { APISettings } from "@/components/settings/APISettings";
+
+const tabs = [
+  { id: "organization", label: "Organization", icon: Building2, desc: "Company profile & domains" },
+  { id: "security", label: "Security & Access", icon: Shield, desc: "Auth, MFA, sessions" },
+  { id: "team", label: "Team & Roles", icon: Users, desc: "Members, invites, permissions" },
+  { id: "branding", label: "Branding", icon: Palette, desc: "Colors, fonts, email templates" },
+  { id: "interviews", label: "Interviews & AI", icon: Video, desc: "Defaults, AI behavior" },
+  { id: "integrations", label: "Integrations", icon: Link2, desc: "ATS, CSV, webhooks" },
+  { id: "privacy", label: "Privacy & Compliance", icon: Database, desc: "Consent, retention, GDPR" },
+  { id: "billing", label: "Billing & Usage", icon: CreditCard, desc: "Plans, payments, invoices" },
+  { id: "notifications", label: "Notifications", icon: Bell, desc: "Alerts, Slack, DND" },
+  { id: "api", label: "API & Developers", icon: Key, desc: "API keys, webhooks, rate limits" },
+];
 
 const Settings = () => {
-  const [companyName, setCompanyName] = useState("Acme Corp");
-  const [defaultQuestions, setDefaultQuestions] = useState([8]);
-  const [defaultDuration, setDefaultDuration] = useState([3]);
-  const [adaptiveDifficulty, setAdaptiveDifficulty] = useState(true);
-  const [followUpQuestions, setFollowUpQuestions] = useState(true);
-  const [defaultInterviewType, setDefaultInterviewType] = useState("video");
+  const [activeTab, setActiveTab] = useState("organization");
+  const [search, setSearch] = useState("");
 
-  const handleSave = () => {
-    toast.success("Settings saved successfully");
-  };
+  const filteredTabs = tabs.filter(t =>
+    t.label.toLowerCase().includes(search.toLowerCase()) ||
+    t.desc.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
-      <main className="container py-4 sm:py-8 px-4 sm:px-6 max-w-4xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Settings</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Configure your AI Interview platform
-            </p>
-          </div>
-          <Button onClick={handleSave} className="w-full sm:w-auto">
-            <Save className="h-4 w-4 mr-2" />
-            Save Changes
-          </Button>
+
+      <main className="container py-6 px-4 sm:px-6 max-w-7xl">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Configure every aspect of your AI Interview platform</p>
         </div>
 
-        <Tabs defaultValue="general" className="space-y-4 sm:space-y-6">
-          <TabsList className="grid w-full grid-cols-4 h-auto">
-            <TabsTrigger value="general" className="text-xs sm:text-sm py-2">General</TabsTrigger>
-            <TabsTrigger value="integrations" className="text-xs sm:text-sm py-2">Integrations</TabsTrigger>
-            <TabsTrigger value="data" className="text-xs sm:text-sm py-2">Data & Privacy</TabsTrigger>
-            <TabsTrigger value="team" className="text-xs sm:text-sm py-2">Team & Roles</TabsTrigger>
-          </TabsList>
+        <div className="flex gap-6">
+          {/* Sidebar */}
+          <aside className="hidden lg:flex flex-col w-56 shrink-0">
+            <div className="relative mb-3">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search settings..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="pl-8 h-9 text-sm"
+              />
+            </div>
+            <nav className="space-y-0.5">
+              {filteredTabs.map(tab => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={cn(
+                      "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left transition-all group text-sm",
+                      activeTab === tab.id
+                        ? "bg-primary/10 text-primary font-medium"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    )}
+                  >
+                    <Icon className={cn("h-4 w-4 shrink-0", activeTab === tab.id ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+          </aside>
 
-          <TabsContent value="general" className="space-y-6">
-          {/* Company Branding */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Building2 className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">Company Branding</CardTitle>
-                    <CardDescription>Customize how your company appears to candidates</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="company-name">Company Name</Label>
-                    <Input
-                      id="company-name"
-                      value={companyName}
-                      onChange={(e) => setCompanyName(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Company Logo</Label>
-                    <div className="flex items-center gap-4">
-                      <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center">
-                        <Building2 className="h-6 w-6 text-muted-foreground" />
+          {/* Mobile tab scroll */}
+          <div className="lg:hidden w-full">
+            <div className="flex gap-1.5 overflow-x-auto pb-2 mb-4 no-scrollbar">
+              {tabs.map(tab => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={cn(
+                      "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 transition-all border",
+                      activeTab === tab.id
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-card text-muted-foreground border-border hover:border-primary/40"
+                    )}
+                  >
+                    <Icon className="h-3.5 w-3.5" />
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, x: 8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.15 }}
+            >
+              {/* Section header */}
+              <div className="mb-5">
+                {(() => {
+                  const tab = tabs.find(t => t.id === activeTab);
+                  const Icon = tab?.icon;
+                  return (
+                    <div className="flex items-center gap-2">
+                      {Icon && <Icon className="h-5 w-5 text-primary" />}
+                      <div>
+                        <h2 className="text-lg font-semibold">{tab?.label}</h2>
+                        <p className="text-sm text-muted-foreground">{tab?.desc}</p>
                       </div>
-                      <Button variant="outline" size="sm">
-                        <Upload className="h-4 w-4 mr-2" />
-                        Upload Logo
-                      </Button>
                     </div>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="primary-color">Brand Color</Label>
-                  <div className="flex items-center gap-4">
-                    <Palette className="h-5 w-5 text-muted-foreground" />
-                    <Input
-                      id="primary-color"
-                      type="color"
-                      defaultValue="#0ea5e9"
-                      className="w-20 h-10 p-1 cursor-pointer"
-                    />
-                    <span className="text-sm text-muted-foreground">Used in candidate interview UI</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+                  );
+                })()}
+              </div>
 
-          {/* Default Interview Rules */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Clock className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">Default Interview Rules</CardTitle>
-                    <CardDescription>Set defaults for new AI interviews</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Label>Default Interview Type</Label>
-                  <Select value={defaultInterviewType} onValueChange={setDefaultInterviewType}>
-                    <SelectTrigger className="w-full sm:w-64">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="text">AI Text Interview</SelectItem>
-                      <SelectItem value="audio">AI Audio Interview</SelectItem>
-                      <SelectItem value="video">AI Video Interview</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label>Default Number of Questions</Label>
-                    <span className="font-medium">{defaultQuestions[0]}</span>
-                  </div>
-                  <Slider
-                    value={defaultQuestions}
-                    onValueChange={setDefaultQuestions}
-                    min={3}
-                    max={15}
-                    step={1}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>3 questions</span>
-                    <span>15 questions</span>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label>Default Time per Question</Label>
-                    <span className="font-medium">{defaultDuration[0]} min</span>
-                  </div>
-                  <Slider
-                    value={defaultDuration}
-                    onValueChange={setDefaultDuration}
-                    min={1}
-                    max={5}
-                    step={1}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>1 min</span>
-                    <span>5 min</span>
-                  </div>
-                </div>
-
-                <div className="space-y-4 pt-2">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>Adaptive Difficulty</Label>
-                      <p className="text-sm text-muted-foreground">AI adjusts question difficulty based on responses</p>
-                    </div>
-                    <Switch
-                      checked={adaptiveDifficulty}
-                      onCheckedChange={setAdaptiveDifficulty}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>AI Follow-up Questions</Label>
-                      <p className="text-sm text-muted-foreground">Allow AI to ask clarifying questions</p>
-                    </div>
-                    <Switch
-                      checked={followUpQuestions}
-                      onCheckedChange={setFollowUpQuestions}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* API Keys */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Key className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">API Keys</CardTitle>
-                    <CardDescription>Manage your API access credentials</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="p-4 rounded-lg border bg-muted/50">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium text-sm">Production API Key</span>
-                    <Button variant="ghost" size="sm">Reveal</Button>
-                  </div>
-                  <code className="text-sm font-mono text-muted-foreground">
-                    sk_live_••••••••••••••••••••••••
-                  </code>
-                </div>
-                <div className="p-4 rounded-lg border bg-muted/50">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium text-sm">Test API Key</span>
-                    <Button variant="ghost" size="sm">Reveal</Button>
-                  </div>
-                  <code className="text-sm font-mono text-muted-foreground">
-                    sk_test_••••••••••••••••••••••••
-                  </code>
-                </div>
-                <Button variant="outline">Generate New API Key</Button>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Usage */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Usage & Limits</CardTitle>
-                <CardDescription>Your current plan usage</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">AI Interviews this month</span>
-                    <span className="font-medium">247 / 500</span>
-                  </div>
-                  <div className="h-2 rounded-full bg-muted overflow-hidden">
-                    <div className="h-full bg-primary rounded-full" style={{ width: "49.4%" }} />
-                  </div>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span>Pro Plan</span>
-                    <span>Resets in 12 days</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-          </TabsContent>
-
-          <TabsContent value="integrations" className="space-y-6">
-            <ATSSettings />
-          </TabsContent>
-
-          <TabsContent value="data" className="space-y-6">
-            <DataOwnershipSettings />
-          </TabsContent>
-
-          <TabsContent value="team" className="space-y-6">
-            <RoleSettings />
-          </TabsContent>
-        </Tabs>
+              {activeTab === "organization" && <OrganizationSettings />}
+              {activeTab === "security" && <SecuritySettings />}
+              {activeTab === "team" && <TeamSettings />}
+              {activeTab === "branding" && <BrandingSettings />}
+              {activeTab === "interviews" && <InterviewSettings />}
+              {activeTab === "integrations" && <ATSSettings />}
+              {activeTab === "privacy" && <PrivacySettings />}
+              {activeTab === "billing" && <BillingSettings />}
+              {activeTab === "notifications" && <NotificationSettings />}
+              {activeTab === "api" && <APISettings />}
+            </motion.div>
+          </div>
+        </div>
       </main>
     </div>
   );
