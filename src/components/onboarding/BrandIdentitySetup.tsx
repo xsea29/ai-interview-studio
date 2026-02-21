@@ -18,6 +18,7 @@ interface BrandIdentitySetupProps {
   updateData: <K extends keyof OnboardingData>(section: K, updates: Partial<OnboardingData[K]>) => void;
   onNext: () => void;
   onBack: () => void;
+  onSkip: () => void;
   step: number;
 }
 
@@ -57,7 +58,7 @@ Best regards,
 {{recruiter_name}}`
 };
 
-const BrandIdentitySetup = ({ data, updateData, onNext, onBack, step }: BrandIdentitySetupProps) => {
+const BrandIdentitySetup = ({ data, updateData, onNext, onBack, onSkip, step }: BrandIdentitySetupProps) => {
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
   const [darkMode, setDarkMode] = useState(false);
   const [logoError, setLogoError] = useState<string | null>(null);
@@ -392,10 +393,15 @@ const BrandIdentitySetup = ({ data, updateData, onNext, onBack, step }: BrandIde
             <ArrowLeft className="w-4 h-4" />
             Back
           </Button>
-          <Button onClick={onNext} size="lg" className="gap-2">
-            Continue to Email Templates
-            <ArrowRight className="w-4 h-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="ghost" onClick={onSkip} className="text-muted-foreground">
+              Skip this phase
+            </Button>
+            <Button onClick={onNext} size="lg" className="gap-2">
+              Continue to Email Templates
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -512,10 +518,15 @@ const BrandIdentitySetup = ({ data, updateData, onNext, onBack, step }: BrandIde
           <ArrowLeft className="w-4 h-4" />
           Back
         </Button>
-        <Button onClick={onNext} size="lg" className="gap-2">
-          Continue to Team Setup
-          <ArrowRight className="w-4 h-4" />
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="ghost" onClick={onSkip} className="text-muted-foreground">
+            Skip this phase
+          </Button>
+          <Button onClick={onNext} size="lg" className="gap-2">
+            Continue to Team Setup
+            <ArrowRight className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );

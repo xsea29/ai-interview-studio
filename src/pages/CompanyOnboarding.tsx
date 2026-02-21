@@ -163,6 +163,16 @@ const CompanyOnboarding = () => {
     }
   };
 
+  const skipPhase = () => {
+    setCompletedPhases(prev => [...prev, currentPhase]);
+    if (currentPhase < 7) {
+      setCurrentPhase(prev => prev + 1);
+      setCurrentSubStep(0);
+    } else {
+      setCurrentPhase(8);
+    }
+  };
+
   const goToPrevStep = () => {
     if (currentSubStep > 0) {
       setCurrentSubStep(prev => prev - 1);
@@ -188,15 +198,15 @@ const CompanyOnboarding = () => {
       case 2:
         return <OrganizationSetup data={data} updateData={updateData} onNext={goToNextStep} onBack={goToPrevStep} step={currentSubStep} />;
       case 3:
-        return <BrandIdentitySetup data={data} updateData={updateData} onNext={goToNextStep} onBack={goToPrevStep} step={currentSubStep} />;
+        return <BrandIdentitySetup data={data} updateData={updateData} onNext={goToNextStep} onBack={goToPrevStep} onSkip={skipPhase} step={currentSubStep} />;
       case 4:
-        return <UserRoleSetup data={data} updateData={updateData} onNext={goToNextStep} onBack={goToPrevStep} step={currentSubStep} />;
+        return <UserRoleSetup data={data} updateData={updateData} onNext={goToNextStep} onBack={goToPrevStep} onSkip={skipPhase} step={currentSubStep} />;
       case 5:
-        return <IntegrationSetup data={data} updateData={updateData} onNext={goToNextStep} onBack={goToPrevStep} step={currentSubStep} />;
+        return <IntegrationSetup data={data} updateData={updateData} onNext={goToNextStep} onBack={goToPrevStep} onSkip={skipPhase} step={currentSubStep} />;
       case 6:
         return <ConsentPrivacySetup data={data} updateData={updateData} onNext={goToNextStep} onBack={goToPrevStep} step={currentSubStep} />;
       case 7:
-        return <BillingActivation data={data} updateData={updateData} onNext={goToNextStep} onBack={goToPrevStep} step={currentSubStep} />;
+        return <BillingActivation data={data} updateData={updateData} onNext={goToNextStep} onBack={goToPrevStep} onSkip={skipPhase} step={currentSubStep} />;
       default:
         return null;
     }

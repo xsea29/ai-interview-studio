@@ -21,6 +21,7 @@ interface UserRoleSetupProps {
   updateData: <K extends keyof OnboardingData>(section: K, updates: Partial<OnboardingData[K]>) => void;
   onNext: () => void;
   onBack: () => void;
+  onSkip: () => void;
   step: number;
 }
 
@@ -94,7 +95,7 @@ const accessMatrix = {
   },
 };
 
-const UserRoleSetup = ({ data, updateData, onNext, onBack, step }: UserRoleSetupProps) => {
+const UserRoleSetup = ({ data, updateData, onNext, onBack, onSkip, step }: UserRoleSetupProps) => {
   const [newEmail, setNewEmail] = useState("");
   const [newRole, setNewRole] = useState<"admin" | "ta_manager" | "recruiter" | "viewer">("recruiter");
   const [bulkEmails, setBulkEmails] = useState("");
@@ -347,10 +348,15 @@ const UserRoleSetup = ({ data, updateData, onNext, onBack, step }: UserRoleSetup
             <ArrowLeft className="w-4 h-4" />
             Back
           </Button>
-          <Button onClick={onNext} size="lg" className="gap-2">
-            Continue to Role Permissions
-            <ArrowRight className="w-4 h-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="ghost" onClick={onSkip} className="text-muted-foreground">
+              Skip this phase
+            </Button>
+            <Button onClick={onNext} size="lg" className="gap-2">
+              Continue to Role Permissions
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -462,10 +468,15 @@ const UserRoleSetup = ({ data, updateData, onNext, onBack, step }: UserRoleSetup
           <ArrowLeft className="w-4 h-4" />
           Back
         </Button>
-        <Button onClick={onNext} size="lg" className="gap-2">
-          Continue to Data Import
-          <ArrowRight className="w-4 h-4" />
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="ghost" onClick={onSkip} className="text-muted-foreground">
+            Skip this phase
+          </Button>
+          <Button onClick={onNext} size="lg" className="gap-2">
+            Continue to Data Import
+            <ArrowRight className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );
