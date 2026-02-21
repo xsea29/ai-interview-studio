@@ -18,6 +18,7 @@ interface BillingActivationProps {
   updateData: <K extends keyof OnboardingData>(section: K, updates: Partial<OnboardingData[K]>) => void;
   onNext: () => void;
   onBack: () => void;
+  onSkip: () => void;
   step: number;
 }
 
@@ -66,7 +67,7 @@ const plans = [
   },
 ];
 
-const BillingActivation = ({ data, updateData, onNext, onBack, step }: BillingActivationProps) => {
+const BillingActivation = ({ data, updateData, onNext, onBack, onSkip, step }: BillingActivationProps) => {
   const [cardNumber, setCardNumber] = useState("");
   const [expiry, setExpiry] = useState("");
   const [cvv, setCvv] = useState("");
@@ -173,10 +174,15 @@ const BillingActivation = ({ data, updateData, onNext, onBack, step }: BillingAc
             <ArrowLeft className="w-4 h-4" />
             Back
           </Button>
-          <Button onClick={onNext} size="lg" className="gap-2">
-            Continue to Payment
-            <ArrowRight className="w-4 h-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="ghost" onClick={onSkip} className="text-muted-foreground">
+              Skip this phase
+            </Button>
+            <Button onClick={onNext} size="lg" className="gap-2">
+              Continue to Payment
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -389,7 +395,7 @@ const BillingActivation = ({ data, updateData, onNext, onBack, step }: BillingAc
           Back
         </Button>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={onNext}>
+          <Button variant="ghost" onClick={onSkip} className="text-muted-foreground">
             Skip for Now
           </Button>
           <Button onClick={onNext} size="lg" className="gap-2">

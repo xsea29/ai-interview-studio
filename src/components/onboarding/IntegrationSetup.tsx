@@ -20,6 +20,7 @@ interface IntegrationSetupProps {
   updateData: <K extends keyof OnboardingData>(section: K, updates: Partial<OnboardingData[K]>) => void;
   onNext: () => void;
   onBack: () => void;
+  onSkip: () => void;
   step: number;
 }
 
@@ -43,7 +44,7 @@ const atsProviders = [
   { id: "taleo", name: "Taleo", logo: "🎯" },
 ];
 
-const IntegrationSetup = ({ data, updateData, onNext, onBack, step }: IntegrationSetupProps) => {
+const IntegrationSetup = ({ data, updateData, onNext, onBack, onSkip, step }: IntegrationSetupProps) => {
   const [csvPreview, setCsvPreview] = useState<string[][] | null>(null);
   const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
   const [importing, setImporting] = useState(false);
@@ -342,10 +343,15 @@ const IntegrationSetup = ({ data, updateData, onNext, onBack, step }: Integratio
             <ArrowLeft className="w-4 h-4" />
             Back
           </Button>
-          <Button onClick={onNext} size="lg" className="gap-2" disabled={data.integrations.mode === "csv" && !csvPreview}>
-            Continue to Field Mapping
-            <ArrowRight className="w-4 h-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="ghost" onClick={onSkip} className="text-muted-foreground">
+              Skip this phase
+            </Button>
+            <Button onClick={onNext} size="lg" className="gap-2" disabled={data.integrations.mode === "csv" && !csvPreview}>
+              Continue to Field Mapping
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -508,6 +514,9 @@ const IntegrationSetup = ({ data, updateData, onNext, onBack, step }: Integratio
           <Button variant="outline" onClick={validateData}>
             <Eye className="w-4 h-4 mr-2" />
             Validate Data
+          </Button>
+          <Button variant="ghost" onClick={onSkip} className="text-muted-foreground">
+            Skip this phase
           </Button>
           <Button onClick={onNext} size="lg" className="gap-2">
             Continue to Privacy Setup
