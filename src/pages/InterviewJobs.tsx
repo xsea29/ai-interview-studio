@@ -324,6 +324,7 @@ export default function InterviewJobs() {
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.3, delay: 0.25 + index * 0.05 }}
                   className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-muted/30 transition-colors cursor-pointer"
+                  onClick={() => window.location.href = `/interviews/jobs/${campaign.id}`}
                 >
                   <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-primary/10 shrink-0">
                     <TypeIcon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />

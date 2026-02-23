@@ -14,6 +14,7 @@ import LoginAdmin from "./pages/LoginAdmin";
 import CreateInterview from "./pages/CreateInterview";
 import InterviewMonitoring from "./pages/InterviewMonitoring";
 import InterviewJobs from "./pages/InterviewJobs";
+import JobCampaignDetail from "./pages/JobCampaignDetail";
 import InterviewDetail from "./pages/InterviewDetail";
 import InterviewReadiness from "./pages/InterviewReadiness";
 import EvaluationReport from "./pages/EvaluationReport";
@@ -104,6 +105,14 @@ const App = () => (
               element={
                 <RequireAuth>
                   <InterviewJobs />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/interviews/jobs/:jobId"
+              element={
+                <RequireAuth>
+                  <JobCampaignDetail />
                 </RequireAuth>
               }
             />
