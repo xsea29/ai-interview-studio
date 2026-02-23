@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ChevronRight } from "lucide-react";
+import { Check, ChevronRight, LogOut } from "lucide-react";
+import { useAuth } from "@/auth/useAuth";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 // Phase Components
@@ -133,6 +135,7 @@ const initialData: OnboardingData = {
 };
 
 const CompanyOnboarding = () => {
+  const { signOut } = useAuth();
   const [currentPhase, setCurrentPhase] = useState(1);
   const [currentSubStep, setCurrentSubStep] = useState(0);
   const [data, setData] = useState<OnboardingData>(initialData);
@@ -220,9 +223,15 @@ const CompanyOnboarding = () => {
           <div className="max-w-6xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-lg font-semibold text-foreground">Company Onboarding</h1>
-              <span className="text-sm text-muted-foreground">
-                Phase {currentPhase} of 7
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-muted-foreground">
+                  Phase {currentPhase} of 7
+                </span>
+                <Button variant="ghost" size="sm" onClick={signOut} className="text-muted-foreground hover:text-foreground">
+                  <LogOut className="w-4 h-4 mr-1.5" />
+                  Sign Out
+                </Button>
+              </div>
             </div>
             
             {/* Phase Progress */}
