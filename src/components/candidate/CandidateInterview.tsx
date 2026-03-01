@@ -8,13 +8,11 @@ import { Button } from "@/components/ui/button";
 
 function generateWavePath(width: number, centerY: number, amplitude: number, frequency: number, phase: number): string {
   const points: string[] = [];
-  const segments = 80;
+  const segments = 100;
   for (let i = 0; i <= segments; i++) {
     const x = (i / segments) * width;
     const normalizedX = (i / segments) * Math.PI * 2 * frequency;
-    const y = centerY + Math.sin(normalizedX + phase) * amplitude
-      + Math.sin(normalizedX * 2.3 + phase * 1.5) * (amplitude * 0.3)
-      + Math.sin(normalizedX * 0.7 + phase * 0.8) * (amplitude * 0.2);
+    const y = centerY + Math.sin(normalizedX + phase) * amplitude;
     points.push(i === 0 ? `M ${x} ${y}` : `L ${x} ${y}`);
   }
   return points.join(" ");
@@ -171,20 +169,16 @@ export function CandidateInterview({
                       d: isAiSpeaking
                         ? [
                             generateWavePath(600, 100, wave.amp, wave.freq, wave.phase),
-                            generateWavePath(600, 100, wave.amp * 0.6, wave.freq * 1.2, wave.phase + 1.5),
-                            generateWavePath(600, 100, wave.amp * 1.1, wave.freq * 0.9, wave.phase + 3),
-                            generateWavePath(600, 100, wave.amp * 0.8, wave.freq * 1.1, wave.phase + 4.5),
-                            generateWavePath(600, 100, wave.amp, wave.freq, wave.phase),
+                            generateWavePath(600, 100, wave.amp * 0.5, wave.freq, wave.phase + 1.5),
+                            generateWavePath(600, 100, wave.amp * 1.1, wave.freq, wave.phase + 3),
+                            generateWavePath(600, 100, wave.amp * 0.7, wave.freq, wave.phase + 4.5),
+                            generateWavePath(600, 100, wave.amp, wave.freq, wave.phase + 6),
                           ]
-                        : [
-                            generateWavePath(600, 100, 2, wave.freq, wave.phase),
-                            generateWavePath(600, 100, 3, wave.freq, wave.phase + 1),
-                            generateWavePath(600, 100, 2, wave.freq, wave.phase),
-                          ],
+                        : generateWavePath(600, 100, 1, wave.freq, wave.phase),
                     }}
                     transition={{
-                      repeat: Infinity,
-                      duration: isAiSpeaking ? wave.speed : 4,
+                      repeat: isAiSpeaking ? Infinity : 0,
+                      duration: isAiSpeaking ? wave.speed : 1.2,
                       ease: "easeInOut",
                     }}
                   />
