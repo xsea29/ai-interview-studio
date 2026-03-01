@@ -178,9 +178,15 @@ const CandidateExperience = () => {
           <AnimatePresence mode="wait">
             {currentStep === "welcome" && (
               <CandidateWelcome
+                candidateName="Alex"
                 companyName={companyBranding.name}
                 jobTitle={companyBranding.jobTitle}
                 recruiterName={companyBranding.recruiterName}
+                interviewType="Technical"
+                scheduledDate="March 5, 2026"
+                scheduledTime="10:00 AM"
+                timeZone="IST (UTC+5:30)"
+                duration={25}
                 questionCount={totalQuestions}
                 onStart={handleStartChecklist}
               />
