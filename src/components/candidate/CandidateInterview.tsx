@@ -303,18 +303,6 @@ export function CandidateInterview({
                       <div className="text-xs font-semibold text-destructive">Recording</div>
                       <div className="text-[10px] text-muted-foreground/60 mt-0.5">Speak your answer</div>
                     </div>
-                    {/* Live audio indicator */}
-                    <div className="flex items-end gap-[2px] h-6">
-                      {[6, 10, 14, 8, 12, 6, 10, 8].map((h, i) => (
-                        <motion.div
-                          key={i}
-                          animate={{ height: [2, h, 2] }}
-                          transition={{ repeat: Infinity, duration: 0.6 + i * 0.08, ease: "easeInOut" }}
-                          className="w-[3px] rounded-full bg-destructive/60"
-                          style={{ height: 2 }}
-                        />
-                      ))}
-                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
