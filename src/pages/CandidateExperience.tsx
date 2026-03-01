@@ -63,8 +63,6 @@ const CandidateExperience = () => {
   });
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [isAiSpeaking, setIsAiSpeaking] = useState(true);
-  const [isRecording, setIsRecording] = useState(false);
-  const [isMicOn, setIsMicOn] = useState(true);
   const [isCameraOn, setIsCameraOn] = useState(true);
 
   const totalQuestions = questions.length;
@@ -92,7 +90,6 @@ const CandidateExperience = () => {
   };
 
   const handleSubmitAnswer = () => {
-    setIsRecording(false);
     if (currentQuestion < totalQuestions - 1) {
       setIsAiSpeaking(true);
       setCurrentQuestion(currentQuestion + 1);
@@ -222,14 +219,7 @@ const CandidateExperience = () => {
                 totalQuestions={totalQuestions}
                 questions={questions}
                 isAiSpeaking={isAiSpeaking}
-                isRecording={isRecording}
-                isMicOn={isMicOn}
                 isCameraOn={isCameraOn}
-                onToggleRecording={() => setIsRecording(!isRecording)}
-                onToggleMic={() => {
-                  setIsMicOn(!isMicOn);
-                  if (isRecording) setIsRecording(false);
-                }}
                 onToggleCamera={() => setIsCameraOn(!isCameraOn)}
                 onSubmitAnswer={handleSubmitAnswer}
                 onEndInterview={handleEndInterview}

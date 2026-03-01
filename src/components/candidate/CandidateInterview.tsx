@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Mic, MicOff, Video, VideoOff, Volume2, Send, PhoneOff, 
+  Mic, MicOff, Video, VideoOff, Send, PhoneOff, 
   Circle, ChevronRight, MessageSquare, Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,11 +11,7 @@ interface CandidateInterviewProps {
   totalQuestions: number;
   questions: string[];
   isAiSpeaking: boolean;
-  isRecording: boolean;
-  isMicOn: boolean;
   isCameraOn: boolean;
-  onToggleRecording: () => void;
-  onToggleMic: () => void;
   onToggleCamera: () => void;
   onSubmitAnswer: () => void;
   onEndInterview: () => void;
@@ -23,16 +19,28 @@ interface CandidateInterviewProps {
 
 export function CandidateInterview({
   currentQuestion, totalQuestions, questions,
-  isAiSpeaking, isRecording, isMicOn, isCameraOn,
-  onToggleRecording, onToggleMic, onToggleCamera,
-  onSubmitAnswer, onEndInterview,
+  isAiSpeaking, isCameraOn,
+  onToggleCamera, onSubmitAnswer, onEndInterview,
 }: CandidateInterviewProps) {
   const progress = ((currentQuestion + 1) / totalQuestions) * 100;
-  const [elapsed, setElapsed] = useState(0);
+  const [isRecording, setIsRecording] = useState(false);
 
-  // Simple timer display
-  const mins = Math.floor(elapsed / 60);
-  const secs = elapsed % 60;
+  // Auto-manage recording: start when AI stops, stop when AI starts
+  useEffect(() => {
+    if (!isAiSpeaking) {
+      // AI finished speaking → auto-start recording
+      const timer = setTimeout(() => setIsRecording(true), 400);
+      return () => clearTimeout(timer);
+    } else {
+      // AI started speaking → stop recording
+      setIsRecording(false);
+    }
+  }, [isAiSpeaking]);
+
+  const handleSubmit = () => {
+    setIsRecording(false);
+    onSubmitAnswer();
+  };
 
   return (
     <motion.div
@@ -44,7 +52,6 @@ export function CandidateInterview({
     >
       {/* Top bar */}
       <div className="flex items-center justify-between mb-3 gap-3 shrink-0">
-        {/* Left: question counter */}
         <div className="flex items-center gap-2.5">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border border-border text-xs font-semibold">
             <MessageSquare className="h-3.5 w-3.5 text-primary" />
@@ -53,7 +60,6 @@ export function CandidateInterview({
           </div>
         </div>
 
-        {/* Center: progress */}
         <div className="flex-1 max-w-md hidden sm:flex items-center gap-3">
           <div className="h-1.5 flex-1 rounded-full bg-muted overflow-hidden">
             <motion.div
@@ -65,7 +71,6 @@ export function CandidateInterview({
           <span className="text-[11px] font-bold text-muted-foreground w-8">{Math.round(progress)}%</span>
         </div>
 
-        {/* Right: status indicators */}
         <div className="flex items-center gap-2">
           {isRecording && (
             <motion.div 
@@ -97,47 +102,22 @@ export function CandidateInterview({
             border: '1px solid rgba(255,255,255,0.06)',
             boxShadow: '0 25px 60px -15px rgba(0,0,0,0.7), 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.05)'
           }}>
-            {/* MacBook-style glossy screen reflection — diagonal light band */}
+            {/* MacBook-style glossy screen reflection */}
             <div className="absolute inset-0 pointer-events-none" style={{
-              background: `
-                linear-gradient(
-                  115deg, 
-                  transparent 0%, 
-                  transparent 30%, 
-                  rgba(255,255,255,0.03) 35%, 
-                  rgba(255,255,255,0.06) 40%, 
-                  rgba(255,255,255,0.08) 42%, 
-                  rgba(255,255,255,0.06) 44%, 
-                  rgba(255,255,255,0.03) 48%, 
-                  transparent 55%, 
-                  transparent 100%
-                )
-              `
+              background: `linear-gradient(115deg, transparent 0%, transparent 30%, rgba(255,255,255,0.03) 35%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.08) 42%, rgba(255,255,255,0.06) 44%, rgba(255,255,255,0.03) 48%, transparent 55%, transparent 100%)`
             }} />
-            {/* Secondary softer reflection */}
             <div className="absolute inset-0 pointer-events-none" style={{
-              background: `
-                linear-gradient(
-                  140deg,
-                  rgba(255,255,255,0.04) 0%,
-                  rgba(255,255,255,0.015) 20%,
-                  transparent 45%,
-                  transparent 100%
-                )
-              `
+              background: `linear-gradient(140deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.015) 20%, transparent 45%, transparent 100%)`
             }} />
-            {/* Top bezel highlight */}
             <div className="absolute top-0 left-0 right-0 h-[1px]" style={{
               background: 'linear-gradient(90deg, transparent 5%, rgba(255,255,255,0.12) 30%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.12) 70%, transparent 95%)'
             }} />
-            {/* Side bezel highlights */}
             <div className="absolute top-0 left-0 bottom-0 w-[1px]" style={{
               background: 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 50%, transparent 100%)'
             }} />
             <div className="absolute top-0 right-0 bottom-0 w-[1px]" style={{
               background: 'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 50%, transparent 100%)'
             }} />
-            {/* Ambient screen glow — very subtle color bleed */}
             <div className="absolute inset-0 pointer-events-none" style={{
               background: 'radial-gradient(ellipse at 50% 50%, rgba(14,165,233,0.03) 0%, transparent 70%)'
             }} />
@@ -177,7 +157,7 @@ export function CandidateInterview({
               </div>
             </div>
 
-            {/* Subtle label under waveform */}
+            {/* Subtle label */}
             <div className="absolute bottom-16 left-1/2 -translate-x-1/2">
               <motion.span
                 animate={{ opacity: isAiSpeaking ? [0.4, 0.8, 0.4] : 0.3 }}
@@ -272,61 +252,87 @@ export function CandidateInterview({
           </AnimatePresence>
         </div>
 
-        {/* Right sidebar — controls */}
+        {/* Right sidebar */}
         <div className="lg:col-span-1 flex lg:flex-col gap-3 order-first lg:order-last">
-          {/* Controls card */}
           <div className="flex-1 bg-card rounded-2xl border border-border/80 p-4 flex flex-col">
+            {/* Recording status */}
             <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-              Controls
+              Status
             </div>
 
-            {/* Media controls */}
-            <div className="flex lg:flex-col items-center gap-3 mb-6">
-              <div className="flex items-center gap-2">
-                <ControlButton
-                  isActive={isCameraOn}
-                  activeIcon={<Video className="h-4 w-4" />}
-                  inactiveIcon={<VideoOff className="h-4 w-4" />}
-                  label="Camera"
-                  onClick={onToggleCamera}
-                />
-                <ControlButton
-                  isActive={isMicOn}
-                  activeIcon={<Volume2 className="h-4 w-4" />}
-                  inactiveIcon={<MicOff className="h-4 w-4" />}
-                  label="Audio"
-                  onClick={onToggleMic}
-                />
-              </div>
-            </div>
-
-            {/* Record button */}
+            {/* Mic status indicator */}
             <div className="flex flex-col items-center gap-3 mb-6">
-              <div className="relative">
-                {isRecording && (
+              <AnimatePresence mode="wait">
+                {isAiSpeaking ? (
                   <motion.div
-                    animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
-                    transition={{ repeat: Infinity, duration: 1.5 }}
-                    className="absolute inset-0 rounded-full bg-destructive/30"
-                  />
+                    key="ai-speaking"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="flex flex-col items-center gap-3"
+                  >
+                    <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
+                      <MicOff className="h-7 w-7 text-muted-foreground" />
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs font-medium text-muted-foreground">Mic Off</div>
+                      <div className="text-[10px] text-muted-foreground/60 mt-0.5">Listening to AI...</div>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="recording"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="flex flex-col items-center gap-3"
+                  >
+                    <div className="relative">
+                      {isRecording && (
+                        <motion.div
+                          animate={{ scale: [1, 1.4, 1], opacity: [0.4, 0, 0.4] }}
+                          transition={{ repeat: Infinity, duration: 1.5 }}
+                          className="absolute inset-0 rounded-full bg-destructive/30"
+                        />
+                      )}
+                      <div className="h-16 w-16 rounded-full bg-destructive/15 flex items-center justify-center border-2 border-destructive/30">
+                        <Mic className="h-7 w-7 text-destructive" />
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs font-semibold text-destructive">Recording</div>
+                      <div className="text-[10px] text-muted-foreground/60 mt-0.5">Speak your answer</div>
+                    </div>
+                    {/* Live audio indicator */}
+                    <div className="flex items-end gap-[2px] h-6">
+                      {[6, 10, 14, 8, 12, 6, 10, 8].map((h, i) => (
+                        <motion.div
+                          key={i}
+                          animate={{ height: [2, h, 2] }}
+                          transition={{ repeat: Infinity, duration: 0.6 + i * 0.08, ease: "easeInOut" }}
+                          className="w-[3px] rounded-full bg-destructive/60"
+                          style={{ height: 2 }}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
                 )}
-                <Button
-                  variant={isRecording ? "destructive" : "default"}
-                  size="icon"
-                  className={`rounded-full h-16 w-16 relative ${!isRecording ? "ai-gradient ai-glow-sm" : "shadow-lg shadow-destructive/20"}`}
-                  onClick={onToggleRecording}
-                  disabled={isAiSpeaking || !isMicOn}
-                >
-                  {isRecording ? (
-                    <MicOff className="h-7 w-7" />
-                  ) : (
-                    <Mic className="h-7 w-7" />
-                  )}
-                </Button>
-              </div>
-              <span className={`text-[11px] font-medium ${isRecording ? "text-destructive" : "text-muted-foreground"}`}>
-                {isAiSpeaking ? "Wait for AI..." : isRecording ? "Recording..." : isMicOn ? "Tap to record" : "Unmute first"}
-              </span>
+              </AnimatePresence>
+            </div>
+
+            {/* Camera toggle */}
+            <div className="mb-6">
+              <button
+                onClick={onToggleCamera}
+                className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all ${
+                  isCameraOn
+                    ? "bg-card border-border/80 text-foreground hover:bg-muted/50"
+                    : "bg-destructive/10 border-destructive/20 text-destructive"
+                }`}
+              >
+                {isCameraOn ? <Video className="h-4 w-4" /> : <VideoOff className="h-4 w-4" />}
+                <span className="text-xs font-medium">{isCameraOn ? "Camera On" : "Camera Off"}</span>
+              </button>
             </div>
 
             {/* Spacer */}
@@ -335,8 +341,8 @@ export function CandidateInterview({
             {/* Submit button */}
             <div className="space-y-2 mt-auto">
               <Button
-                onClick={onSubmitAnswer}
-                disabled={!isRecording}
+                onClick={handleSubmit}
+                disabled={isAiSpeaking}
                 className="w-full gap-2 ai-gradient h-11 text-sm font-semibold group"
               >
                 <Send className="h-4 w-4" />
@@ -364,33 +370,5 @@ export function CandidateInterview({
         </div>
       </div>
     </motion.div>
-  );
-}
-
-function ControlButton({
-  isActive,
-  activeIcon,
-  inactiveIcon,
-  label,
-  onClick,
-}: {
-  isActive: boolean;
-  activeIcon: React.ReactNode;
-  inactiveIcon: React.ReactNode;
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all ${
-        isActive
-          ? "bg-card border-border/80 text-foreground hover:bg-muted/50"
-          : "bg-destructive/10 border-destructive/20 text-destructive hover:bg-destructive/15"
-      }`}
-    >
-      {isActive ? activeIcon : inactiveIcon}
-      <span className="text-[10px] font-medium">{label}</span>
-    </button>
   );
 }
