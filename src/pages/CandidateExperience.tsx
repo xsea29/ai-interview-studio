@@ -1,26 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Brain, 
-  Mic, 
-  MicOff, 
-  Video, 
-  VideoOff, 
-  Volume2, 
-  CheckCircle, 
-  Send,
-  Sparkles,
-  Wifi,
-  PhoneOff,
-  Circle,
-  Clock,
-  MessageSquare,
-  ArrowRight,
-  Shield,
-  Briefcase,
-  User
+  Wifi, Shield, Briefcase
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { CandidateConsentScreen } from "@/components/interview/CandidateConsentScreen";
 import { FailureRecoveryBanner } from "@/components/interview/FailureRecoveryBanner";
 import { CandidateWelcome } from "@/components/candidate/CandidateWelcome";
@@ -54,36 +36,20 @@ const questions = [
 const CandidateExperience = () => {
   const [currentStep, setCurrentStep] = useState<CandidateStep>("welcome");
   const [showRecoveryBanner, setShowRecoveryBanner] = useState(false);
-  const [checklistItems, setChecklistItems] = useState({
-    quiet: false,
-    mic: false,
-    camera: false,
-    network: false,
-  });
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [isAiSpeaking, setIsAiSpeaking] = useState(true);
   const [isCameraOn, setIsCameraOn] = useState(true);
+  const [networkStrength, setNetworkStrength] = useState<"strong" | "moderate" | "weak" | null>(null);
 
   const totalQuestions = questions.length;
 
   const handleStartChecklist = () => setCurrentStep("consent");
-
   const handleConsent = () => setCurrentStep("checklist");
-
-  const handleDecline = () => {
-    window.location.href = "/";
-  };
-
+  const handleDecline = () => { window.location.href = "/"; };
   const handleStartVerification = () => setCurrentStep("verification");
 
   const handleVerificationComplete = (photoData: string, aadhaarData: string) => {
-    // In production, store these securely
     console.log("Identity verified - photo and aadhaar captured");
-    setCurrentStep("interview");
-    setTimeout(() => setIsAiSpeaking(false), 3000);
-  };
-
-  const handleStartInterview = () => {
     setCurrentStep("interview");
     setTimeout(() => setIsAiSpeaking(false), 3000);
   };
@@ -106,20 +72,16 @@ const CandidateExperience = () => {
     }
   };
 
-  const allChecked = Object.values(checklistItems).every(Boolean);
+  const showNetworkIndicator = networkStrength && (currentStep === "interview" || currentStep === "verification");
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Refined header */}
+      {/* Header */}
       <header className="border-b border-border/60 bg-card/80 backdrop-blur-md sticky top-0 z-50">
         <div className="container flex h-16 items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-3">
             {companyBranding.logoUrl ? (
-              <img 
-                src={companyBranding.logoUrl} 
-                alt={companyBranding.name} 
-                className="h-9 w-9 rounded-lg object-contain"
-              />
+              <img src={companyBranding.logoUrl} alt={companyBranding.name} className="h-9 w-9 rounded-lg object-contain" />
             ) : (
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold text-sm">
                 {companyBranding.name.charAt(0)}
@@ -144,7 +106,7 @@ const CandidateExperience = () => {
       </header>
 
       <main className="flex-1 flex flex-col">
-        {/* Step indicator for non-interview steps */}
+        {/* Step indicator */}
         {currentStep !== "interview" && currentStep !== "complete" && currentStep !== "verification" && (
           <div className="container px-4 sm:px-6 pt-6">
             <div className="max-w-2xl mx-auto">
@@ -205,17 +167,13 @@ const CandidateExperience = () => {
 
             {currentStep === "checklist" && (
               <CandidateChecklist
-                checklistItems={checklistItems}
-                setChecklistItems={setChecklistItems}
-                allChecked={allChecked}
                 onStart={handleStartVerification}
+                onNetworkReady={(strength) => setNetworkStrength(strength)}
               />
             )}
 
             {currentStep === "verification" && (
-              <CandidateIdentityVerification
-                onComplete={handleVerificationComplete}
-              />
+              <CandidateIdentityVerification onComplete={handleVerificationComplete} />
             )}
 
             {currentStep === "interview" && (
@@ -242,8 +200,48 @@ const CandidateExperience = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-border/40 py-3 bg-card/50">
+      {/* Footer with network indicator */}
+      <footer className="border-t border-border/40 py-3 bg-card/50 relative">
+        {/* Network strength indicator — bottom left */}
+        {showNetworkIndicator && (
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2"
+          >
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/60 border border-border/60">
+              <Wifi className={`h-3.5 w-3.5 ${
+                networkStrength === "strong" ? "text-emerald-500" :
+                networkStrength === "moderate" ? "text-amber-500" :
+                "text-destructive"
+              }`} />
+              <div className="flex items-end gap-[2px]">
+                {[1, 2, 3, 4].map((bar) => {
+                  const filled = networkStrength === "strong" ? 4 : networkStrength === "moderate" ? 2 : 1;
+                  return (
+                    <div
+                      key={bar}
+                      className={`w-[3px] rounded-sm transition-colors ${
+                        bar <= filled
+                          ? networkStrength === "strong" ? "bg-emerald-500" :
+                            networkStrength === "moderate" ? "bg-amber-500" : "bg-destructive"
+                          : "bg-border"
+                      }`}
+                      style={{ height: 4 + bar * 2 }}
+                    />
+                  );
+                })}
+              </div>
+              <span className={`text-[10px] font-medium capitalize ${
+                networkStrength === "strong" ? "text-emerald-500" :
+                networkStrength === "moderate" ? "text-amber-500" :
+                "text-destructive"
+              }`}>
+                {networkStrength}
+              </span>
+            </div>
+          </motion.div>
+        )}
         <div className="container flex items-center justify-center gap-4 text-[11px] text-muted-foreground/60 px-4">
           <span>Powered by InterviewFlux AI</span>
           <span>•</span>
