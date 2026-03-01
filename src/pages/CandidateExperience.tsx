@@ -59,7 +59,6 @@ const CandidateExperience = () => {
     mic: false,
     camera: false,
     network: false,
-    consent: false,
   });
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [isAiSpeaking, setIsAiSpeaking] = useState(true);
