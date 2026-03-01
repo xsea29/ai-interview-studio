@@ -92,14 +92,14 @@ export function CandidateInterview({
         {/* AI Main View — takes 3 cols */}
         <div className="lg:col-span-3 flex flex-col gap-3 min-h-0">
           {/* AI Video area */}
-          <div className="relative flex-1 bg-card rounded-2xl overflow-hidden border border-border/80 min-h-[300px]">
-            {/* Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--surface-2))] via-background to-[hsl(var(--primary)/0.03)]" />
+          <div className="relative flex-1 rounded-2xl overflow-hidden border border-white/[0.06] min-h-[300px]" style={{ background: 'linear-gradient(135deg, #0a0a0a 0%, #111111 40%, #0d0d0d 100%)' }}>
+            {/* Glass reflection */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.04] via-transparent to-transparent" />
             
             {/* Subtle grid pattern */}
-            <div className="absolute inset-0 opacity-[0.03]" style={{
-              backgroundImage: `radial-gradient(circle, hsl(var(--foreground)) 1px, transparent 1px)`,
-              backgroundSize: '24px 24px'
+            <div className="absolute inset-0 opacity-[0.04]" style={{
+              backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)`,
+              backgroundSize: '28px 28px'
             }} />
 
             {/* AI Avatar */}
@@ -162,39 +162,39 @@ export function CandidateInterview({
                 layout
                 className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold backdrop-blur-md transition-colors duration-300 ${
                   isAiSpeaking
-                    ? "bg-primary/15 text-primary border border-primary/25 shadow-sm shadow-primary/10"
-                    : "bg-card/90 text-foreground border border-border/60"
+                    ? "bg-primary/20 text-primary border border-primary/25"
+                    : "bg-white/10 text-white/90 border border-white/10"
                 }`}
               >
-                <div className={`w-2 h-2 rounded-full transition-colors ${isAiSpeaking ? "bg-primary animate-pulse" : "bg-success"}`} />
+                <div className={`w-2 h-2 rounded-full transition-colors ${isAiSpeaking ? "bg-primary animate-pulse" : "bg-emerald-400"}`} />
                 {isAiSpeaking ? "AI is speaking..." : "Your turn to respond"}
               </motion.div>
             </div>
 
             {/* AI label */}
-            <div className="absolute top-4 right-4 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-card/60 backdrop-blur-sm border border-border/40 text-[10px] font-medium text-muted-foreground">
+            <div className="absolute top-4 right-4 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/[0.06] backdrop-blur-sm border border-white/[0.08] text-[10px] font-medium text-white/60">
               <Sparkles className="h-3 w-3 text-primary" />
               AI Interviewer
             </div>
 
             {/* Candidate mini view (PiP) */}
-            <div className="absolute bottom-4 right-4 w-36 sm:w-44 aspect-[4/3] rounded-xl overflow-hidden border-2 border-border/60 shadow-lg bg-card">
-              <div className="absolute inset-0 flex items-center justify-center bg-muted/80">
+            <div className="absolute bottom-4 right-4 w-36 sm:w-44 aspect-[4/3] rounded-xl overflow-hidden border border-white/[0.1] shadow-2xl shadow-black/50" style={{ background: '#1a1a1a' }}>
+              <div className="absolute inset-0 flex items-center justify-center">
                 {isCameraOn ? (
                   <div className="flex flex-col items-center gap-1">
-                    <Video className="h-5 w-5 text-muted-foreground/40" />
-                    <span className="text-[9px] text-muted-foreground/50">Camera Preview</span>
+                    <Video className="h-5 w-5 text-white/25" />
+                    <span className="text-[9px] text-white/30">Camera Preview</span>
                   </div>
                 ) : (
-                  <VideoOff className="h-5 w-5 text-muted-foreground/40" />
+                  <VideoOff className="h-5 w-5 text-white/25" />
                 )}
               </div>
-              <div className="absolute bottom-1.5 left-1.5 px-2 py-0.5 bg-background/80 backdrop-blur-sm rounded text-[10px] font-medium">
+              <div className="absolute bottom-1.5 left-1.5 px-2 py-0.5 bg-black/60 backdrop-blur-sm rounded text-[10px] font-medium text-white/80">
                 You
               </div>
               {isRecording && (
                 <div className="absolute top-1.5 right-1.5 w-3 h-3 rounded-full bg-destructive flex items-center justify-center">
-                  <div className="w-1.5 h-1.5 rounded-full bg-destructive-foreground animate-pulse" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                 </div>
               )}
             </div>
