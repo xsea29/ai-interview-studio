@@ -53,22 +53,22 @@ export function CandidateWelcome({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -16 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="max-w-2xl w-full mx-auto"
+      className="max-w-2xl w-full mx-auto py-2"
     >
       {/* Hero */}
-      <div className="text-center mb-8">
+      <div className="text-center mb-4">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.15, type: "spring", stiffness: 200 }}
-          className="relative inline-flex mb-5"
+          className="relative inline-flex mb-3"
         >
-          <div className="h-16 w-16 rounded-2xl ai-gradient flex items-center justify-center ai-glow">
-            <Sparkles className="h-7 w-7 text-primary-foreground" />
+          <div className="h-12 w-12 rounded-xl ai-gradient flex items-center justify-center ai-glow">
+            <Sparkles className="h-5 w-5 text-primary-foreground" />
           </div>
         </motion.div>
 
-        <motion.h1 {...fadeUp(0.2)} className="text-2xl sm:text-3xl font-bold tracking-tight mb-1.5">
+        <motion.h1 {...fadeUp(0.2)} className="text-xl sm:text-2xl font-bold tracking-tight mb-1">
           {candidateName ? `Hi ${candidateName}, Welcome!` : "Welcome to Your Interview"}
         </motion.h1>
         <motion.p {...fadeUp(0.3)} className="text-muted-foreground text-sm max-w-md mx-auto">
@@ -80,7 +80,7 @@ export function CandidateWelcome({
       {/* Interview Details Card */}
       <motion.div
         {...fadeUp(0.4)}
-        className="rounded-xl border border-border bg-card p-5 sm:p-6 mb-4"
+        className="rounded-xl border border-border bg-card p-4 sm:p-5 mb-3"
       >
         <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
           Interview Details
@@ -110,7 +110,7 @@ export function CandidateWelcome({
       {/* Instructions Card */}
       <motion.div
         {...fadeUp(0.5)}
-        className="rounded-xl border border-border bg-card p-5 sm:p-6 mb-6"
+        className="rounded-xl border border-border bg-card p-4 sm:p-5 mb-4"
       >
         <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
           Instructions

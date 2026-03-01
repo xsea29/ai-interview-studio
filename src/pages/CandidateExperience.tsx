@@ -174,7 +174,7 @@ const CandidateExperience = () => {
           </div>
         )}
 
-        <div className="flex-1 flex items-start justify-center py-4 sm:py-8 px-4 sm:px-6">
+        <div className="flex-1 flex items-center justify-center py-4 sm:py-6 px-4 sm:px-6 overflow-auto">
           <AnimatePresence mode="wait">
             {currentStep === "welcome" && (
               <CandidateWelcome
