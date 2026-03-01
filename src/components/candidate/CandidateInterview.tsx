@@ -137,7 +137,7 @@ export function CandidateInterview({
             }} />
 
             {/* SVG String Wave Visualizer */}
-            <div className="absolute inset-0 flex items-end justify-center pb-[25%]">
+            <div className="absolute inset-0 flex items-end justify-center pb-[15%]">
               <svg
                 viewBox="0 0 600 200"
                 className="w-[60%] max-w-[360px] h-28 sm:h-36"
