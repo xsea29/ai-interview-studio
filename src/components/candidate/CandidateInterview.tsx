@@ -6,6 +6,20 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+function generateWavePath(width: number, centerY: number, amplitude: number, frequency: number, phase: number): string {
+  const points: string[] = [];
+  const segments = 80;
+  for (let i = 0; i <= segments; i++) {
+    const x = (i / segments) * width;
+    const normalizedX = (i / segments) * Math.PI * 2 * frequency;
+    const y = centerY + Math.sin(normalizedX + phase) * amplitude
+      + Math.sin(normalizedX * 2.3 + phase * 1.5) * (amplitude * 0.3)
+      + Math.sin(normalizedX * 0.7 + phase * 0.8) * (amplitude * 0.2);
+    points.push(i === 0 ? `M ${x} ${y}` : `L ${x} ${y}`);
+  }
+  return points.join(" ");
+}
+
 interface CandidateInterviewProps {
   currentQuestion: number;
   totalQuestions: number;
@@ -122,39 +136,60 @@ export function CandidateInterview({
               background: 'radial-gradient(ellipse at 50% 50%, rgba(14,165,233,0.03) 0%, transparent 70%)'
             }} />
 
-            {/* Sound Wave Visualizer */}
+            {/* SVG String Wave Visualizer */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="flex items-end gap-[5px] h-40 sm:h-52">
+              <svg
+                viewBox="0 0 600 200"
+                className="w-[80%] max-w-[500px] h-40 sm:h-52"
+                preserveAspectRatio="none"
+              >
+                <defs>
+                  <filter id="wave-glow">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
                 {[
-                  { h: 28, d: 0.7 }, { h: 44, d: 0.9 }, { h: 64, d: 1.1 }, { h: 36, d: 0.8 },
-                  { h: 80, d: 1.3 }, { h: 56, d: 1.0 }, { h: 96, d: 1.5 }, { h: 48, d: 0.85 },
-                  { h: 72, d: 1.2 }, { h: 100, d: 1.4 }, { h: 72, d: 1.1 }, { h: 48, d: 0.95 },
-                  { h: 88, d: 1.3 }, { h: 60, d: 1.0 }, { h: 80, d: 1.2 }, { h: 40, d: 0.9 },
-                  { h: 64, d: 1.1 }, { h: 52, d: 0.85 }, { h: 36, d: 0.75 }, { h: 24, d: 0.7 },
-                ].map(({ h, d }, i) => (
-                  <motion.div
-                    key={i}
-                    animate={isAiSpeaking 
-                      ? { 
-                          height: [h * 0.15, h, h * 0.3, h * 0.85, h * 0.15],
-                          opacity: [0.4, 1, 0.6, 0.9, 0.4]
-                        }
-                      : { 
-                          height: [4, 6, 4],
-                          opacity: 0.2
-                        }
-                    }
+                  { amp: 40, freq: 1.2, phase: 0, opacity: 0.15, width: 1, speed: 2.5 },
+                  { amp: 55, freq: 0.8, phase: 1, opacity: 0.25, width: 1.5, speed: 2 },
+                  { amp: 35, freq: 1.5, phase: 2.5, opacity: 0.2, width: 1, speed: 3 },
+                  { amp: 50, freq: 1.0, phase: 0.5, opacity: 1, width: 2.5, speed: 1.8 },
+                  { amp: 30, freq: 1.8, phase: 3.5, opacity: 0.3, width: 1, speed: 2.2 },
+                ].map((wave, wi) => (
+                  <motion.path
+                    key={wi}
+                    fill="none"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={wave.width}
+                    strokeLinecap="round"
+                    opacity={wave.opacity}
+                    filter={wi === 3 ? "url(#wave-glow)" : undefined}
+                    animate={{
+                      d: isAiSpeaking
+                        ? [
+                            generateWavePath(600, 100, wave.amp, wave.freq, wave.phase),
+                            generateWavePath(600, 100, wave.amp * 0.6, wave.freq * 1.2, wave.phase + 1.5),
+                            generateWavePath(600, 100, wave.amp * 1.1, wave.freq * 0.9, wave.phase + 3),
+                            generateWavePath(600, 100, wave.amp * 0.8, wave.freq * 1.1, wave.phase + 4.5),
+                            generateWavePath(600, 100, wave.amp, wave.freq, wave.phase),
+                          ]
+                        : [
+                            generateWavePath(600, 100, 2, wave.freq, wave.phase),
+                            generateWavePath(600, 100, 3, wave.freq, wave.phase + 1),
+                            generateWavePath(600, 100, 2, wave.freq, wave.phase),
+                          ],
+                    }}
                     transition={{
                       repeat: Infinity,
-                      duration: isAiSpeaking ? d : 2,
+                      duration: isAiSpeaking ? wave.speed : 4,
                       ease: "easeInOut",
-                      delay: i * 0.05,
                     }}
-                    className="w-[4px] sm:w-[5px] rounded-full bg-primary"
-                    style={{ height: 4 }}
                   />
                 ))}
-              </div>
+              </svg>
             </div>
 
             {/* Subtle label */}
