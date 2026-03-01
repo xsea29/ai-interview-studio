@@ -27,8 +27,9 @@ import { CandidateWelcome } from "@/components/candidate/CandidateWelcome";
 import { CandidateChecklist } from "@/components/candidate/CandidateChecklist";
 import { CandidateInterview } from "@/components/candidate/CandidateInterview";
 import { CandidateComplete } from "@/components/candidate/CandidateComplete";
+import { CandidateIdentityVerification } from "@/components/candidate/CandidateIdentityVerification";
 
-type CandidateStep = "welcome" | "consent" | "checklist" | "interview" | "complete";
+type CandidateStep = "welcome" | "consent" | "checklist" | "verification" | "interview" | "complete";
 
 const companyBranding = {
   name: "Acme Inc",
@@ -74,6 +75,15 @@ const CandidateExperience = () => {
 
   const handleDecline = () => {
     window.location.href = "/";
+  };
+
+  const handleStartVerification = () => setCurrentStep("verification");
+
+  const handleVerificationComplete = (photoData: string, aadhaarData: string) => {
+    // In production, store these securely
+    console.log("Identity verified - photo and aadhaar captured");
+    setCurrentStep("interview");
+    setTimeout(() => setIsAiSpeaking(false), 3000);
   };
 
   const handleStartInterview = () => {
@@ -139,7 +149,7 @@ const CandidateExperience = () => {
 
       <main className="flex-1 flex flex-col">
         {/* Step indicator for non-interview steps */}
-        {currentStep !== "interview" && currentStep !== "complete" && (
+        {currentStep !== "interview" && currentStep !== "complete" && currentStep !== "verification" && (
           <div className="container px-4 sm:px-6 pt-6">
             <div className="max-w-2xl mx-auto">
               <div className="flex items-center gap-2 mb-6">
@@ -196,7 +206,13 @@ const CandidateExperience = () => {
                 checklistItems={checklistItems}
                 setChecklistItems={setChecklistItems}
                 allChecked={allChecked}
-                onStart={handleStartInterview}
+                onStart={handleStartVerification}
+              />
+            )}
+
+            {currentStep === "verification" && (
+              <CandidateIdentityVerification
+                onComplete={handleVerificationComplete}
               />
             )}
 
