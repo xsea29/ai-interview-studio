@@ -137,15 +137,15 @@ export function CandidateInterview({
             }} />
 
             {/* SVG String Wave Visualizer */}
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-end justify-center pb-[25%]">
               <svg
                 viewBox="0 0 600 200"
-                className="w-[80%] max-w-[500px] h-40 sm:h-52"
+                className="w-[60%] max-w-[360px] h-28 sm:h-36"
                 preserveAspectRatio="none"
               >
                 <defs>
                   <filter id="wave-glow">
-                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feGaussianBlur stdDeviation="2" result="blur" />
                     <feMerge>
                       <feMergeNode in="blur" />
                       <feMergeNode in="SourceGraphic" />
@@ -153,16 +153,16 @@ export function CandidateInterview({
                   </filter>
                 </defs>
                 {[
-                  { amp: 40, freq: 1.2, phase: 0, opacity: 0.15, width: 1, speed: 2.5 },
-                  { amp: 55, freq: 0.8, phase: 1, opacity: 0.25, width: 1.5, speed: 2 },
-                  { amp: 35, freq: 1.5, phase: 2.5, opacity: 0.2, width: 1, speed: 3 },
-                  { amp: 50, freq: 1.0, phase: 0.5, opacity: 1, width: 2.5, speed: 1.8 },
-                  { amp: 30, freq: 1.8, phase: 3.5, opacity: 0.3, width: 1, speed: 2.2 },
+                  { amp: 30, freq: 1.2, phase: 0, opacity: 0.1, width: 0.5, speed: 2.5 },
+                  { amp: 40, freq: 0.8, phase: 1, opacity: 0.15, width: 0.7, speed: 2 },
+                  { amp: 25, freq: 1.5, phase: 2.5, opacity: 0.12, width: 0.5, speed: 3 },
+                  { amp: 35, freq: 1.0, phase: 0.5, opacity: 0.7, width: 1, speed: 1.8 },
+                  { amp: 20, freq: 1.8, phase: 3.5, opacity: 0.18, width: 0.5, speed: 2.2 },
                 ].map((wave, wi) => (
                   <motion.path
                     key={wi}
                     fill="none"
-                    stroke="hsl(var(--primary))"
+                    stroke="rgba(255,255,255,0.9)"
                     strokeWidth={wave.width}
                     strokeLinecap="round"
                     opacity={wave.opacity}
