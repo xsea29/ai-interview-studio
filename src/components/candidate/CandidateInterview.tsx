@@ -92,14 +92,23 @@ export function CandidateInterview({
         {/* AI Main View — takes 3 cols */}
         <div className="lg:col-span-3 flex flex-col gap-3 min-h-0">
           {/* AI Video area */}
-          <div className="relative flex-1 rounded-2xl overflow-hidden border border-white/[0.06] min-h-[300px]" style={{ background: 'linear-gradient(135deg, #0a0a0a 0%, #111111 40%, #0d0d0d 100%)' }}>
-            {/* Glass reflection */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.04] via-transparent to-transparent" />
+          <div className="relative flex-1 rounded-2xl overflow-hidden min-h-[300px]" style={{ 
+            background: 'linear-gradient(145deg, rgba(20,20,25,0.85) 0%, rgba(10,10,15,0.9) 50%, rgba(15,15,20,0.85) 100%)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            boxShadow: '0 0 80px -20px rgba(14,165,233,0.08), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.3)'
+          }}>
+            {/* Glass shine — top-left highlight */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.07] via-white/[0.02] to-transparent pointer-events-none" />
+            {/* Glass edge reflection */}
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.15] to-transparent" />
+            {/* Bottom edge */}
+            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.05] to-transparent" />
             
-            {/* Subtle grid pattern */}
-            <div className="absolute inset-0 opacity-[0.04]" style={{
-              backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)`,
-              backgroundSize: '28px 28px'
+            {/* Subtle noise texture for glass feel */}
+            <div className="absolute inset-0 opacity-[0.015]" style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
             }} />
 
             {/* Sound Wave Visualizer */}
