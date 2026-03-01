@@ -43,7 +43,7 @@ import {
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
-type InterviewStatus = "not_started" | "in_progress" | "completed";
+type InterviewStatus = "not_started" | "in_progress" | "completed" | "cancelled";
 type InterviewType = "text" | "audio" | "video";
 type IntegrityLevel = "high" | "medium" | "low";
 
@@ -154,6 +154,15 @@ const mockInterviews: CandidateInterview[] = [
     source: "manual",
   },
   {
+    id: "cancelled-1",
+    candidateName: "Robert Taylor",
+    email: "robert.t@email.com",
+    jobTitle: "Senior Frontend Developer",
+    interviewType: "video",
+    status: "cancelled",
+    source: "csv",
+  },
+  {
     id: "8",
     candidateName: "Lisa Wang",
     email: "lisa.w@email.com",
@@ -190,6 +199,11 @@ const statusConfig = {
     icon: CheckCircle,
     label: "Completed",
     className: "status-completed",
+  },
+  cancelled: {
+    icon: Ban,
+    label: "Cancelled",
+    className: "bg-destructive/10 text-destructive border-destructive/30",
   },
 };
 
@@ -356,6 +370,7 @@ const InterviewMonitoring = () => {
               <SelectItem value="not_started">Not started</SelectItem>
               <SelectItem value="in_progress">In progress</SelectItem>
               <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectContent>
           </Select>
           <Select value={typeFilter} onValueChange={setTypeFilter}>
