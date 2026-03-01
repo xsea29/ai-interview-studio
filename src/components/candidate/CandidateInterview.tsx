@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Brain, Mic, MicOff, Video, VideoOff, Volume2, Send, PhoneOff, 
-  Circle, Clock, ChevronRight, MessageSquare, Sparkles, SkipForward
+  Mic, MicOff, Video, VideoOff, Volume2, Send, PhoneOff, 
+  Circle, ChevronRight, MessageSquare, Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -102,58 +102,50 @@ export function CandidateInterview({
               backgroundSize: '28px 28px'
             }} />
 
-            {/* AI Avatar */}
+            {/* Sound Wave Visualizer */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="relative">
-                {/* Outer ring */}
-                <motion.div
-                  animate={isAiSpeaking ? { 
-                    scale: [1, 1.15, 1],
-                    opacity: [0.3, 0.15, 0.3]
-                  } : { scale: 1, opacity: 0 }}
-                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                  className="absolute inset-0 -m-4 rounded-full ai-gradient"
-                />
-                {/* Middle ring */}
-                <motion.div
-                  animate={isAiSpeaking ? { 
-                    scale: [1, 1.08, 1],
-                    opacity: [0.5, 0.25, 0.5]
-                  } : { scale: 1, opacity: 0 }}
-                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut", delay: 0.2 }}
-                  className="absolute inset-0 -m-2 rounded-full ai-gradient"
-                />
-                {/* Core orb */}
-                <motion.div
-                  animate={isAiSpeaking ? { scale: [1, 1.04, 1] } : {}}
-                  transition={{ repeat: Infinity, duration: 1.5 }}
-                  className="w-28 h-28 sm:w-36 sm:h-36 rounded-full ai-gradient flex items-center justify-center ai-glow relative"
-                >
-                  <Brain className="h-14 w-14 sm:h-16 sm:w-16 text-primary-foreground" />
-                </motion.div>
-
-                {/* Sound wave */}
-                <AnimatePresence>
-                  {isAiSpeaking && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 4 }}
-                      className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex items-end gap-[3px]"
-                    >
-                      {[8, 16, 24, 16, 20, 12, 18, 14, 8].map((h, i) => (
-                        <motion.div
-                          key={i}
-                          animate={{ height: [h * 0.4, h, h * 0.4] }}
-                          transition={{ repeat: Infinity, duration: 0.8 + i * 0.1, ease: "easeInOut" }}
-                          className="w-[3px] rounded-full bg-primary/70"
-                          style={{ height: h * 0.4 }}
-                        />
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+              <div className="flex items-end gap-[5px] h-40 sm:h-52">
+                {[
+                  { h: 28, d: 0.7 }, { h: 44, d: 0.9 }, { h: 64, d: 1.1 }, { h: 36, d: 0.8 },
+                  { h: 80, d: 1.3 }, { h: 56, d: 1.0 }, { h: 96, d: 1.5 }, { h: 48, d: 0.85 },
+                  { h: 72, d: 1.2 }, { h: 100, d: 1.4 }, { h: 72, d: 1.1 }, { h: 48, d: 0.95 },
+                  { h: 88, d: 1.3 }, { h: 60, d: 1.0 }, { h: 80, d: 1.2 }, { h: 40, d: 0.9 },
+                  { h: 64, d: 1.1 }, { h: 52, d: 0.85 }, { h: 36, d: 0.75 }, { h: 24, d: 0.7 },
+                ].map(({ h, d }, i) => (
+                  <motion.div
+                    key={i}
+                    animate={isAiSpeaking 
+                      ? { 
+                          height: [h * 0.15, h, h * 0.3, h * 0.85, h * 0.15],
+                          opacity: [0.4, 1, 0.6, 0.9, 0.4]
+                        }
+                      : { 
+                          height: [4, 6, 4],
+                          opacity: 0.2
+                        }
+                    }
+                    transition={{
+                      repeat: Infinity,
+                      duration: isAiSpeaking ? d : 2,
+                      ease: "easeInOut",
+                      delay: i * 0.05,
+                    }}
+                    className="w-[4px] sm:w-[5px] rounded-full bg-primary"
+                    style={{ height: 4 }}
+                  />
+                ))}
               </div>
+            </div>
+
+            {/* Subtle label under waveform */}
+            <div className="absolute bottom-16 left-1/2 -translate-x-1/2">
+              <motion.span
+                animate={{ opacity: isAiSpeaking ? [0.4, 0.8, 0.4] : 0.3 }}
+                transition={{ repeat: Infinity, duration: 2 }}
+                className="text-[11px] font-medium text-white/40 tracking-widest uppercase"
+              >
+                {isAiSpeaking ? "Speaking" : "Idle"}
+              </motion.span>
             </div>
 
             {/* Status badge */}
