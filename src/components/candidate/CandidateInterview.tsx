@@ -5,6 +5,7 @@ import {
   Circle, ChevronRight, MessageSquare, Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { InterviewHeartbeat } from "./InterviewHeartbeat";
 
 function generateWavePath(width: number, centerY: number, amplitude: number, frequency: number, phase: number): string {
   const points: string[] = [];
@@ -386,6 +387,15 @@ export function CandidateInterview({
           </div>
         </div>
       </div>
+
+      {/* Heartbeat monitoring */}
+      <InterviewHeartbeat
+        interviewId="demo-interview-id"
+        sessionId="demo-session-id"
+        active={true}
+        attemptsRemaining={2}
+        onSessionEnd={onEndInterview}
+      />
     </motion.div>
   );
 }
